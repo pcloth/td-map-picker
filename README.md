@@ -30,7 +30,7 @@ export default {
   data(){
     return {
         mapkey,
-        value:'106.50421,29.61973'
+        value:''
     }
   }
 }
@@ -61,7 +61,7 @@ body {
 |centerOffset|array|地图中心视野偏移|[0, -0.05]|
 |placeholder|string|搜索框提示|请输入关键词搜索或移动定位点|
 |noData|string|无数据提示|暂无数据，请搜索关键词。|
-|color|straing|主颜色|#1890ff|
+|color|string|主颜色|#1890ff|
 |mode|string|模式，可选项：webview 小程序webview模式，提交后，返回到小程序里面；picker 选择模式，提交后，返回到父组件|picker|
 |startLonlat|string|开始坐标字符串，用逗号分割lon,lat，如果传入了这个，将会返回距离|无|
 |drivingPolicy|number|计算距离和线路的策略:0=最少时间、1=最短距离、2=避开高速、3=步行|1|

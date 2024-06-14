@@ -10,7 +10,7 @@
                     <span>{{currentPoint.lonlat}}</span>
                 </div>
                 <div class="submit_button" :class="{
-                    td_disabled:!canSubmit&& currentPoint?true:false,
+                    td_disabled: submitDisabled
                 }" @click.stop="submitPoint">确定</div>
             </div>
             <div class="hide_popup_button" @click.stop="hidePopup=!hidePopup">
@@ -55,6 +55,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+
 let searchObj = null;
 let marker = null;
 
@@ -156,7 +158,8 @@ export default {
             allpage: 1,
             total: 0,
             hidePopup: true,
-            canSubmit: true,
+            routeLoadFlag: true,
+            loadWxSdkFlag:false,
         };
     },
     watch:{
@@ -166,6 +169,17 @@ export default {
         lnglat(){
             const strLonLat = this.lnglat.lng + "," + this.lnglat.lat;
             this.$emit('input',strLonLat)
+        }
+    },
+    computed:{
+        submitDisabled(){
+            // 线路加载
+            if(!this.routeLoadFlag) return true;
+            // 点位获取
+            if(!this.currentPoint) return true;
+            // 如果是webview小程序sdk加载状态
+            if(this.options.mode==='webview' && !this.loadWxSdkFlag) return true;
+            return false;
         }
     },
     mounted() {
@@ -192,6 +206,23 @@ export default {
             document.head.appendChild(script);
             script.onload = () => {
                 this.initOnload();
+            };
+        },
+        loadWxsdk(){
+            // document.write('<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"><\/script>');
+            if(window.wx){
+                return
+            }
+            const script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "https://res.wx.qq.com/open/js/jweixin-1.4.0.js";
+            script.onerror = (e) => {
+                alert('微信sdk加载失败'+JSON.stringify(e))
+            };
+            document.head.appendChild(script);
+            script.onload = () => {
+                // this.initOnload();
+                this.loadWxSdkFlag = true;
             };
         },
         changeValue(){
@@ -239,6 +270,9 @@ export default {
                 "--td_map_picker_color",
                 this.options.color
             );
+            if(this.options.mode==='webview'){
+                this.loadWxsdk()
+            }
         },
         getGeoPoint() {
             // 获取当前浏览器定位
@@ -359,7 +393,7 @@ export default {
             });
         },
         async setCurrentPoint(data) {
-            this.canSubmit = false;
+            this.routeLoadFlag = false;
             const { startLonlat, drivingPolicy } = this.options;
             let drives = {};
             if (startLonlat) {
@@ -377,7 +411,7 @@ export default {
                 ...drives,
                 startLonlat,
             };
-            this.canSubmit = true;
+            this.routeLoadFlag = true;
         },
         getDrivingRoute(startLonlat, endLonlat, policy) {
             const T = window.T;
@@ -417,12 +451,14 @@ export default {
             if (wx && wx.miniProgram) {
                 wx.miniProgram.postMessage({ data: this.currentPoint });
                 wx.miniProgram.navigateBack();
+            }else{
+                alert('请在小程序环境中使用webview')
             }
         },
         submitPoint() {
-            if (this.mode === "picker") {
-                this.$emit("submit", this.currentPoint);
-            } else if (this.mode === "webview") {
+            console.log('提交',this.currentPoint)
+            this.$emit("submit", this.currentPoint);
+            if (this.options.mode === "webview") {
                 this.submitMPWebview();
             }
         },
@@ -577,8 +613,7 @@ export default {
 }
 
 .td_disabled {
-    color: #999;
-    border-color: #999;
+    opacity: 0.5;
     cursor: not-allowed;
     pointer-events: none;
 }
