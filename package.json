@@ -1,50 +1,61 @@
 {
-  "name": "tk-map-picker",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --target lib --name demoLib src/index.js && pnpm scss",
-    "scss": "node-sass src/assets/components.scss dist/components.css && node-sass --output-style compressed src/assets/components.scss dist/components.min.css",
-    "lint": "vue-cli-service lint"
-  },
-  "main": "./dist/demoLib.common.js",
-  "dependencies": {
-    "core-js": "^3.8.3"
-  },
-  "peerDependencies": {
-    "vue": "^2.6.14"
-  },
-  "devDependencies": {
-    "vue": "^2.6.14",
-    "@babel/core": "^7.12.16",
-    "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3",
-    "node-sass": "^7.0.3",
-    "sass-loader": "^13.1.0",
-    "vue-template-compiler": "^2.6.14"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
+    "name": "tk-map-picker",
+    "version": "0.1.0",
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build --target lib --name TkMapPicker src/index.js",
+        "build:npm": "node build/webpack.lib.js",
+        "scss": "node-sass src/assets/components.scss dist/components.css && node-sass --output-style compressed src/assets/components.scss dist/components.min.css",
+        "lint": "vue-cli-service lint"
     },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
+    "keywords": [
+        "tk-map-picker",
+        "天地图",
+        "坐标拾取器"
     ],
-    "parserOptions": {
-      "parser": "@babel/eslint-parser"
+    "description": "这是一个基于vue2的天地图坐标拾取器，支持组件模式和webview引入模式（小程序）",
+    "private": false,
+    "author": {
+        "name": "pcloth",
+        "email": "pcloth@gmail.com"
     },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+    "main": "src/index.js",
+    "dependencies": {
+        "core-js": "^3.8.3"
+    },
+    "peerDependencies": {
+        "vue": "^2.6.14"
+    },
+    "devDependencies": {
+        "vue": "^2.6.14",
+        "@babel/core": "^7.12.16",
+        "@babel/eslint-parser": "^7.12.16",
+        "@vue/cli-plugin-babel": "~5.0.0",
+        "@vue/cli-plugin-eslint": "~5.0.0",
+        "@vue/cli-service": "~5.0.0",
+        "eslint": "^7.32.0",
+        "eslint-plugin-vue": "^8.0.3",
+        "node-sass": "^7.0.3",
+        "sass-loader": "^13.1.0",
+        "vue-template-compiler": "^2.6.14"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "extends": [
+            "plugin:vue/essential",
+            "eslint:recommended"
+        ],
+        "parserOptions": {
+            "parser": "@babel/eslint-parser"
+        },
+        "rules": {}
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not dead"
+    ]
 }

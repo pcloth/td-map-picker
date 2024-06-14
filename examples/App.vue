@@ -5,8 +5,7 @@
 </template>
 
 <script>
-import TdMapPicker from './TdMapPicker'
-import "@/assets/components.scss"
+import TdMapPicker from '../src/TdMapPicker/index.vue'
 // 引入地图key
 import {mapkey} from '../key'
 
