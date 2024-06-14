@@ -1,6 +1,6 @@
 <template>
   <div style="width:100vw;height:100vh;">
-    <TdMapPicker :tk="mapkey"/>
+    <TdMapPicker v-model="value" :tk="mapkey"/>
   </div>
 </template>
 
@@ -16,7 +16,8 @@ export default {
   },
   data(){
     return {
-        mapkey
+        mapkey,
+        value:'106.50421,29.61973'
     }
   }
 }

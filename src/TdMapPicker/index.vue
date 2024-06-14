@@ -59,6 +59,11 @@ let searchObj = null;
 let marker = null;
 
 const props = {
+    // 传入坐标
+    value:{
+        type:String,
+        default:""
+    },
     /** 地图key */
     tk: {
         type: String,
@@ -154,6 +159,15 @@ export default {
             canSubmit: true,
         };
     },
+    watch:{
+        value(){
+            this.changeValue()
+        },
+        lnglat(){
+            const strLonLat = this.lnglat.lng + "," + this.lnglat.lat;
+            this.$emit('input',strLonLat)
+        }
+    },
     mounted() {
         this.initUrlParams();
         this.initMap();
@@ -180,9 +194,20 @@ export default {
                 this.initOnload();
             };
         },
+        changeValue(){
+            console.log('改变位置',this.value)
+            const g = this.value.split(",");
+            this.lnglat = new window.T.LngLat(g[0], g[1]);
+            this.setPoint(this.lnglat);
+            this.getLocation();
+        },
         initOnload() {
             this.initMapInstance();
-            this.getGeoPoint();
+            if(this.value){
+                this.changeValue()
+            }else{
+                this.getGeoPoint();
+            }
         },
         initMapInstance(lnglat) {
             const T = window.T;
