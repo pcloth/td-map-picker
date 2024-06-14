@@ -87,13 +87,13 @@ const props = {
     hotKeywords: {
         type: Array,
         default() {
-            return ["学校", "医院", "超市"];
+            return ["学校", "小区"];
         },
     },
     centerOffset: {
         type: Array,
         default() {
-            return [0, -0.08];
+            return [0, -0.05];
         },
     },
     placeholder:{
@@ -395,7 +395,7 @@ export default {
             if (wx && wx.miniProgram) {
                 console.log("小程序环境");
                 wx.miniProgram.postMessage({ data: this.currentPoint });
-                wx.miniProgram.navigateBack;
+                wx.miniProgram.navigateBack();
             }
         },
         submitPoint() {
@@ -484,9 +484,9 @@ export default {
 .td_search_input {
     display: flex;
     flex: 1;
-    height: 1.7rem;
+    height: 2.0rem;
     border: 1px solid #f0f0f0;
-    border-radius: 0.2rem;
+    border-radius: 0.4rem;
     padding: 0 0.4rem;
     /* 激活时边框蓝色 */
     outline: none;
@@ -597,6 +597,7 @@ export default {
     background: rgba(255, 255, 255, 0.4);
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border-radius: 0.2rem;
 }
 
