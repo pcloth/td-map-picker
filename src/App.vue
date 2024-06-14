@@ -1,12 +1,14 @@
 <template>
   <div style="width:100vw;height:100vh;">
-    <TdMapPicker/>
+    <TdMapPicker :tk="mapkey"/>
   </div>
 </template>
 
 <script>
 import TdMapPicker from './TdMapPicker'
 import "@/assets/components.scss"
+// 引入地图key
+import {mapkey} from '../key'
 
 export default {
   name: 'App',
@@ -15,6 +17,7 @@ export default {
   },
   data(){
     return {
+        mapkey
     }
   }
 }

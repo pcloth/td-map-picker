@@ -14,38 +14,42 @@
                 }" @click.stop="submitPoint">确定</div>
             </div>
             <div class="hide_popup_button" @click.stop="hidePopup=!hidePopup">
-                <template v-if="hidePopup">展开</template>
-                <template v-else>收起</template>
+                <img class="arrow_icon" :class="{
+                    flip:hidePopup
+                }" src="./images/arrow.png" alt="">
             </div>
             <div class="td_search_box">
-                <input v-model="searchWord" @change="searchMap" class="td_search_input" placeholder="请搜索地址" />
+                <input v-model="searchWord" @change="searchMap" class="td_search_input" :placeholder="placeholder" />
             </div>
-            <div class="hot_keywords">
-                <label>{{options.hotTitle}}</label>
-                <div @click="setWord(item)" class="hot_keyword" v-for="item,idx in options.hotKeywords" :key="idx">{{item}}</div>
-            </div>
-            <div class="td_address_list">
-                <div class="td_not_data" v-if="!pointsList.length">
-                    暂无数据，请搜索关键词
+            <template v-if="!hidePopup">
+                <div class="hot_keywords">
+                    <label>{{options.hotTitle}}</label>
+                    <div @click="setWord(item)" class="hot_keyword" v-for="item,idx in options.hotKeywords" :key="idx">{{item}}</div>
                 </div>
-                <template v-else>
-                    <div class="td_address" @click="selectPoint(item)" v-for="item,idx in pointsList" :key="item.hotPointID">
-                        <span class="index">{{idx+1}}</span>
-                        <div class="td_add_content">
-                            <span class="name">{{item.name}}</span>
-                            <span class="address">{{item.address}}</span>
-                        </div>
+                <div class="td_address_list">
+                    <div class="td_not_data" v-if="!pointsList.length">
+                        {{noData}}
                     </div>
-                    <div class="pagination">
-                        <div class="pagination_button" :class="{
+                    <template v-else>
+                        <div class="td_address" @click="selectPoint(item)" v-for="item,idx in pointsList" :key="item.hotPointID">
+                            <span class="index">{{idx+1}}</span>
+                            <div class="td_add_content">
+                                <span class="name">{{item.name}}</span>
+                                <span class="address">{{item.address}}</span>
+                            </div>
+                        </div>
+                        <div class="pagination">
+                            <div class="pagination_button" :class="{
                             td_disabled:currentPage<=1
                         }" @click="gotoPage(-1)">上一页</div>
-                        <div class="pagination_button" :class="{
+                            <div class="pagination_button" :class="{
                             td_disabled:allpage<=currentPage
                         }" @click="gotoPage(+1)">下一页</div>
-                    </div>
-                </template>
-            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
         </div>
     </div>
 </template>
@@ -92,6 +96,18 @@ const props = {
             return [0, -0.08];
         },
     },
+    placeholder:{
+        type:String,
+        default:"请输入关键词搜索或移动定位点"
+    },
+    noData:{
+        type:String,
+        default:"暂无数据，请搜索关键词。"
+    },
+    color:{
+        type:String,
+        default:"#1890ff"
+    },
     /**
      * 使用模式
      * webview 小程序webview模式，提交后，返回到小程序里面
@@ -104,17 +120,17 @@ const props = {
     /** 如果传入了这个，将会返回距离 */
     startLonlat: {
         type: String,
-        default: "106.50918,29.5208",
+        default: "",
     },
     /** policy：策略常量。常量如下：
         TMAP_DRIVING_POLICY_LEAST_TIME = 0 最少时间
         TMAP_DRIVING_POLICY_LEAST_DISTANCE = 1 最短距离
         TMAP_DRIVING_POLICY_AVOID_HIGHWAYS = 2 避开高速
         TMAP_DRIVING_POLICY_WALK = 3 步行 */
-    drivingPolicy:{
-        type:Number,
-        default:1
-    }
+    drivingPolicy: {
+        type: Number,
+        default: 1,
+    },
 };
 export default {
     name: "td-map-picker",
@@ -147,7 +163,7 @@ export default {
         initMap() {
             if (window.T) {
                 // 已经存在了
-                this.initOnload()
+                this.initOnload();
                 return;
             }
             const script = document.createElement("script");
@@ -162,10 +178,10 @@ export default {
             };
             document.head.appendChild(script);
             script.onload = () => {
-                this.initOnload()
+                this.initOnload();
             };
         },
-        initOnload(){
+        initOnload() {
             this.initMapInstance();
             this.getGeoPoint();
         },
@@ -183,18 +199,23 @@ export default {
             let url = new URL(window.location.href);
             // 获取所有的参数覆盖到options上
             url.searchParams.forEach((value, key) => {
-                const propsConf = props[key]
-                if(propsConf){
-                    if([Array,Object,Boolean].includes(propsConf.type)){
-                        value = JSON.parse(value)
-                    }else if(propsConf.type === Number){
-                        value = Number(value)
+                const propsConf = props[key];
+                if (propsConf) {
+                    if ([Array, Object, Boolean].includes(propsConf.type)) {
+                        value = JSON.parse(value);
+                    } else if (propsConf.type === Number) {
+                        value = Number(value);
                     }
                 }
                 this.options[key] = value;
             });
             this.currentZoom = this.options.zoom;
             console.log(this.options, "options>>");
+            // 将color参数写入css变量
+            document.documentElement.style.setProperty(
+                "--td_map_picker_color",
+                this.options.color
+            );
         },
         getGeoPoint() {
             // 获取当前浏览器定位
@@ -247,6 +268,7 @@ export default {
             const T = window.T;
             if (!searchObj) {
                 searchObj = new T.LocalSearch(this.map, {
+                    pageCapacity:5,
                     onSearchComplete: (result) => {
                         this.searchOnResult(result);
                     },
@@ -314,48 +336,55 @@ export default {
                 });
             });
         },
-        async setCurrentPoint(data){
+        async setCurrentPoint(data) {
             this.canSubmit = false;
-            const {startLonlat, drivingPolicy} = this.options
-            let drives = {}
-            if(startLonlat){
-                drives =  await this.getDrivingRoute(startLonlat, data.lonlat, drivingPolicy)
+            const { startLonlat, drivingPolicy } = this.options;
+            let drives = {};
+            if (startLonlat) {
+                drives = await this.getDrivingRoute(
+                    startLonlat,
+                    data.lonlat,
+                    drivingPolicy
+                );
             }
             this.currentPoint = {
+                distance: null,
+                duration: null,
+                routes: null,
                 ...data,
                 ...drives,
-                startLonlat
-                }
-            this.canSubmit = true
+                startLonlat,
+            };
+            this.canSubmit = true;
         },
-        getDrivingRoute(startLonlat, endLonlat, policy){
+        getDrivingRoute(startLonlat, endLonlat, policy) {
             const T = window.T;
             // const that = this;
             return new Promise((resolve) => {
                 const driving = new T.DrivingRoute(this.map, {
                     policy: policy,
                     onSearchComplete: function (result) {
-                        const plans = result.getNumPlans()
-                        if(plans){
-                            const plan = result.getPlan(0)
+                        const plans = result.getNumPlans();
+                        if (plans) {
+                            const plan = result.getPlan(0);
                             resolve({
                                 distance: plan.getDistance(),
                                 duration: plan.getDuration(),
-                                routes:plan.routes
-                            })
-                        }else{
+                                routes: plan.routes,
+                            });
+                        } else {
                             resolve({
                                 distance: 0,
                                 duration: 0,
-                                routes:[]
-                            })
+                                routes: [],
+                            });
                         }
                     },
                 });
                 const startG = startLonlat.split(",");
                 const endG = endLonlat.split(",");
                 driving.search(
-                    new T.LngLat(startG[0], startG[1]), 
+                    new T.LngLat(startG[0], startG[1]),
                     new T.LngLat(endG[0], endG[1])
                 );
             });
@@ -370,7 +399,7 @@ export default {
             }
         },
         submitPoint() {
-            console.log(this.currentPoint,'this.currentPoint')
+            console.log(this.currentPoint, "this.currentPoint");
             if (this.mode === "picker") {
                 this.$emit("submit", this.currentPoint);
             } else if (this.mode === "webview") {
@@ -386,7 +415,9 @@ export default {
     width: 100%;
     height: 100%;
     position: relative;
-    --td_map_picker_color: #1890ff;
+    --pop-mini-height: 4.4rem;
+    --pop-full-height: 23.2rem;
+    --font-size: 0.9rem;
 }
 
 .td_map {
@@ -396,34 +427,56 @@ export default {
 
 .td_map_popup {
     position: absolute;
-    bottom: 10px;
-    width: calc(100% - 40px);
-    left: 10px;
+    bottom: 0.4rem;
+    width: calc(100% - 1.6rem);
+    left: 0.4rem;
     background: #fff;
-    padding: 10px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 0.4rem;
+    padding-top: 0;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1);
     z-index: 9999;
-    min-height: 400px;
+    height: var(--pop-full-height);
     display: flex;
     flex-direction: column;
+    animation: changeToFull 0.6s;
 }
 
 .hide_popup_button {
     text-align: center;
     width: 100%;
     color: var(--td_map_picker_color);
-    margin-bottom: 5px;
-    font-size: 11px;
+    margin-bottom: 0.2rem;
+    margin-top: 0.2rem;
 }
 
+
+
 .td_map_popup.mini {
-    height: 60px;
-    min-height: 60px;
+    height: var(--pop-mini-height);
+    animation: changeToMini 0.6s;
+}
+
+@keyframes changeToMini {
+    0% {
+        height: var(--pop-full-height);
+    }
+    100% {
+        height: var(--pop-mini-height);
+    }
+}
+
+@keyframes changeToFull {
+    0% {
+        height: var(--pop-mini-height);
+    }
+    100% {
+        height: var(--pop-full-height);
+    }
 }
 
 .td_search_box {
-    /* padding: 10px; */
+    /* padding: 0.4rem; */
     border-bottom: 1px solid #f0f0f0;
     display: flex;
 }
@@ -431,10 +484,10 @@ export default {
 .td_search_input {
     display: flex;
     flex: 1;
-    height: 40px;
+    height: 1.7rem;
     border: 1px solid #f0f0f0;
-    border-radius: 4px;
-    padding: 0 10px;
+    border-radius: 0.2rem;
+    padding: 0 0.4rem;
     /* 激活时边框蓝色 */
     outline: none;
 }
@@ -444,10 +497,11 @@ export default {
 }
 
 .td_address_list {
-    margin-top: 10px;
+    margin-top: 0.4rem;
     display: flex;
     flex-direction: column;
     overflow: scroll;
+    flex: 1;
 }
 
 .td_address {
@@ -464,11 +518,11 @@ export default {
 }
 
 .td_address .index {
-    width: 30px;
+    width: 1.2rem;
     text-align: center;
-    font-size: 15px;
+    font-size: var(--font-size);
     color: #999;
-    margin-right: 10px;
+    margin-right: 0.4rem;
 }
 
 .td_add_content .name {
@@ -476,7 +530,7 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 15px;
+    font-size: var(--font-size);
     font-weight: bold;
 }
 
@@ -485,21 +539,21 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 12px;
+    font-size: 0.5rem;
     color: #999;
 }
 
 .pagination {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: 0.4rem;
 }
 .pagination_button {
-    margin: 0 5px;
+    margin: 0 0.2rem;
     color: var(--td_map_picker_color);
     cursor: pointer;
     border: 1px solid var(--td_map_picker_color);
-    padding: 5px 10px;
+    padding: 0.2rem 0.4rem;
 }
 
 .td_disabled {
@@ -514,21 +568,21 @@ export default {
     justify-content: center;
     align-items: center;
     color: #999;
-    min-height: 200px;
+    flex: 1;
 }
 
 .hot_keywords {
     display: flex;
     align-items: center;
-    margin-top: 10px;
-    padding-left: 10px;
+    margin-top: 0.4rem;
+    padding-left: 0.4rem;
 }
 
 .hot_keyword {
-    padding: 5px 10px;
+    padding: 0.2rem 0.4rem;
     border: 1px solid #f0f0f0;
     border-radius: 4px;
-    margin-right: 10px;
+    margin-right: 0.4rem;
     cursor: pointer;
     color: var(--td_map_picker_color);
     border: 1px solid var(--td_map_picker_color);
@@ -537,12 +591,13 @@ export default {
 .tips {
     position: absolute;
     top: -50px;
-    width: calc(100% - 20px);
-    padding: 0 10px;
+    left: 0;
+    width: calc(100% - 0.8rem);
+    padding: 0 0.4rem;
     background: rgba(255, 255, 255, 0.4);
     display: flex;
     align-items: center;
-    border-radius: 3px;
+    border-radius: 0.2rem;
 }
 
 .submit_box {
@@ -562,11 +617,30 @@ export default {
     color: #fff;
     border-radius: 4px;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 0.4rem;
     width: 60px;
     height: 34px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.arrow_icon {
+    width: 20px;
+    animation: transform 0.3s;
+}
+
+.arrow_icon.flip {
+    transform: rotate(180deg);
+    animation: transform 0.3s;
+}
+
+@keyframes transform {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(180deg);
+    }
 }
 </style>
