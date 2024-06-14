@@ -157,7 +157,6 @@ export default {
     mounted() {
         this.initUrlParams();
         this.initMap();
-        window.tt = this;
     },
     methods: {
         initMap() {
@@ -210,7 +209,6 @@ export default {
                 this.options[key] = value;
             });
             this.currentZoom = this.options.zoom;
-            console.log(this.options, "options>>");
             // 将color参数写入css变量
             document.documentElement.style.setProperty(
                 "--td_map_picker_color",
@@ -224,7 +222,6 @@ export default {
             return new Promise((resolve, reject) => {
                 const geolocation = new T.Geolocation();
                 geolocation.getCurrentPosition(function (result) {
-                    console.log(result, "定位信息");
                     this.lnglat = result.lnglat;
                     that.setPoint(result.lnglat, true);
                     that.getLocation();
@@ -393,13 +390,11 @@ export default {
         submitMPWebview() {
             const wx = window.wx;
             if (wx && wx.miniProgram) {
-                console.log("小程序环境");
                 wx.miniProgram.postMessage({ data: this.currentPoint });
                 wx.miniProgram.navigateBack();
             }
         },
         submitPoint() {
-            console.log(this.currentPoint, "this.currentPoint");
             if (this.mode === "picker") {
                 this.$emit("submit", this.currentPoint);
             } else if (this.mode === "webview") {

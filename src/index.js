@@ -1,7 +1,10 @@
-import TdMapPicker from './TdMapPicker/index.vue'
+import TdMapPicker_ from './TdMapPicker/index.vue'
+
+export const TdMapPicker = TdMapPicker_
 
 export default {
     install (Vue) {
-        Vue.component(TdMapPicker.name, TdMapPicker)
-    }
+        Vue.component(TdMapPicker_.name, TdMapPicker_)
+    },
+    TdMapPicker:TdMapPicker_
 }

@@ -1,15 +1,16 @@
 {
-    "name": "tk-map-picker",
-    "version": "0.1.0",
+    "name": "td-map-picker",
+    "version": "0.1.2",
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build --target lib --name TkMapPicker src/index.js",
         "build:npm": "node build/webpack.lib.js",
+        "auto:npm": "npm run build:npm && cd dist & npm publish && cd ..",
         "scss": "node-sass src/assets/components.scss dist/components.css && node-sass --output-style compressed src/assets/components.scss dist/components.min.css",
         "lint": "vue-cli-service lint"
     },
     "keywords": [
-        "tk-map-picker",
+        "td-map-picker",
         "天地图",
         "坐标拾取器"
     ],
