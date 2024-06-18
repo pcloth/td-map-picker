@@ -55,16 +55,24 @@
 </template>
 
 <script>
-import { computed } from 'vue';
-
+import coord from './coord.js'
 let searchObj = null;
 let marker = null;
 
 const props = {
-    // 传入坐标
+    // 传入坐标wgs84
     value:{
         type:String,
         default:""
+    },
+    /** submit提交的坐标系:
+     * gcj02:国测局坐标系
+     * wgs84:国际坐标系
+     * bd09:百度坐标系
+     */
+    coordType:{
+        type:String,
+        default:"gcj02"
     },
     /** 地图key */
     tk: {
@@ -229,6 +237,23 @@ export default {
                 this.loadWxSdkFlag = true;
             };
         },
+        lonlatToCoordType(lonlat){
+            const g = lonlat.split(",");
+            let value = [g[0],g[1]] 
+            if(this.coordType==='gcj02'){
+                value = coord.wgs84togcj02(g[0],g[1])
+            }
+            return value.map(v=>v.toFixed(6))
+        },
+        coordTypeToLonlat(lonlat){
+            const g = lonlat.split(",");
+            let value = [g[0],g[1]] 
+            if(this.coordType==='gcj02'){
+                value = coord.gcj02towgs84(g[0],g[1])
+            }
+            return value.map(v=>v.toFixed(6))
+            
+        },
         changeValue(value){
             if(!window.T){
                 setTimeout(()=>{
@@ -236,6 +261,12 @@ export default {
                 },500)
                 return 
             }
+            // console.log(this.coordTypeToLonlat(value),'test',value)
+            // const g = this.coordTypeToLonlat(value);
+            // console.log(g,'test',value)
+            // if(!g){
+            //     return
+            // }
             const g = value.split(",");
             this.lnglat = new window.T.LngLat(g[0], g[1]);
             this.setPoint(this.lnglat);
@@ -295,7 +326,7 @@ export default {
                 const geolocation = new T.Geolocation();
                 geolocation.getCurrentPosition(function (result) {
                     this.lnglat = result.lnglat;
-                    that.setPoint(result.lnglat, true);
+                    // that.setPoint(result.lnglat, true);
                     that.getLocation();
                     resolve(result);
                 });
@@ -314,7 +345,8 @@ export default {
                     lnglat.lng + this.options.centerOffset[0],
                     lnglat.lat + this.options.centerOffset[1]
                 );
-                this.map.centerAndZoom(offsetCenter, this.currentZoom);
+                const zoom = this.map?.getZoom()||this.currentZoom
+                this.map.centerAndZoom(offsetCenter, zoom);
             }
             if (!marker) {
                 marker = new T.Marker(lnglat);
@@ -470,6 +502,7 @@ export default {
         },
         submitPoint() {
             console.log('提交',this.currentPoint)
+            this.currentPoint[this.coordType] = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.$emit("submit", this.currentPoint);
             if (this.options.mode === "webview") {
                 this.submitMPWebview();
