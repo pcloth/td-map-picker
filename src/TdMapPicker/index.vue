@@ -138,6 +138,10 @@ const props = {
         type: Number,
         default: 1,
     },
+    defaultHide:{
+        type:Boolean,
+        default:false
+    }
 };
 export default {
     name: "td-map-picker",
@@ -157,14 +161,14 @@ export default {
             currentPage: 1,
             allpage: 1,
             total: 0,
-            hidePopup: true,
+            hidePopup: this.defaultHide,
             routeLoadFlag: true,
             loadWxSdkFlag:false,
         };
     },
     watch:{
         value(){
-            this.changeValue()
+            this.changeValue(this.value)
         },
         lnglat(){
             const strLonLat = this.lnglat.lng + "," + this.lnglat.lat;
@@ -225,9 +229,14 @@ export default {
                 this.loadWxSdkFlag = true;
             };
         },
-        changeValue(){
-            console.log('改变位置',this.value)
-            const g = this.value.split(",");
+        changeValue(value){
+            if(!window.T){
+                setTimeout(()=>{
+                    this.changeValue(value)
+                },500)
+                return 
+            }
+            const g = value.split(",");
             this.lnglat = new window.T.LngLat(g[0], g[1]);
             this.setPoint(this.lnglat);
             this.getLocation();
@@ -235,7 +244,7 @@ export default {
         initOnload() {
             this.initMapInstance();
             if(this.value){
-                this.changeValue()
+                this.changeValue(this.value)
             }else{
                 this.getGeoPoint();
             }
@@ -265,6 +274,10 @@ export default {
                 this.options[key] = value;
             });
             this.currentZoom = this.options.zoom;
+            this.hidePopup = this.options.defaultHide;
+            if(this.options.value){
+                this.changeValue(this.options.value)
+            }
             // 将color参数写入css变量
             document.documentElement.style.setProperty(
                 "--td_map_picker_color",

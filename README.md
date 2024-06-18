@@ -18,7 +18,7 @@ npm install td-map-picker
 </template>
 
 <script>
-import TdMapPicker from '../src/TdMapPicker/index.vue'
+import {TdMapPicker} from 'td-map-picker'
 // 引入地图key
 import {mapkey} from '../key'
 
@@ -65,6 +65,7 @@ body {
 |mode|string|模式，可选项：webview 小程序webview模式，提交后，返回到小程序里面；picker 选择模式，提交后，返回到父组件|picker|
 |startLonlat|string|开始坐标字符串，用逗号分割lon,lat，如果传入了这个，将会返回距离|无|
 |drivingPolicy|number|计算距离和线路的策略:0=最少时间、1=最短距离、2=避开高速、3=步行|1|
+|defaultHide|boolen|引入时是否收起信息框|false|
 
 ### 事件
 |事件|参数|说明|
