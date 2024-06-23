@@ -237,22 +237,35 @@ export default {
                 this.loadWxSdkFlag = true;
             };
         },
-        lonlatToCoordType(lonlat){
+        lonlatToCoordType(lonlat, coordType=this.coordType){
             const g = lonlat.split(",");
             let value = [g[0],g[1]] 
-            if(this.coordType==='gcj02'){
+            if(coordType==='gcj02'){
                 value = coord.wgs84togcj02(g[0],g[1])
+            } else if(coordType==='bd09'){
+                value = coord.wgs84togcj02(g[0],g[1])
+                value = coord.gcj02tobd09(value[0],value[1])
+            } else if(coordType==='wgs84'){
+                // 天地图和wgs84非常接近
+            } else {
+                console.error('未知的坐标系')
             }
             return value.map(v=>v.toFixed(6))
         },
-        coordTypeToLonlat(lonlat){
+        coordTypeToLonlat(lonlat, coordType=this.coordType){
             const g = lonlat.split(",");
             let value = [g[0],g[1]] 
-            if(this.coordType==='gcj02'){
+            if(coordType==='gcj02'){
                 value = coord.gcj02towgs84(g[0],g[1])
+            } else if(coordType==='bd09'){
+                value = coord.bd09togcj02(g[0],g[1])
+                value = coord.gcj02towgs84(value[0],value[1])
+            } else if(coordType==='wgs84'){
+                // 天地图和wgs84非常接近
+            } else {
+                console.error('未知的坐标系')
             }
             return value.map(v=>v.toFixed(6))
-            
         },
         changeValue(value){
             if(!window.T){
