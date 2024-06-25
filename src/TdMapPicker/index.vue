@@ -111,6 +111,31 @@ const props = {
             return [0, -0.05];
         },
     },
+    offsetRateMaps:{
+        type:Object,
+        default(){
+            return {
+                1:1200,
+                2:800,
+                3:500,
+                4:280,
+                5:100,
+                6:45,
+                7:35,
+                8:25,
+                9:15,
+                10:4,
+                11:1.5,
+                12:1,
+                13:0.5555555556,
+                14:0.3333333333,
+                15:0.1666666667,
+                16:0.0833333333,
+                17:0.0416666667,
+                18:0.0208333333,
+            }
+        }
+    },
     placeholder:{
         type:String,
         default:"请输入关键词搜索或移动定位点"
@@ -301,6 +326,12 @@ export default {
             this.map = new T.Map(this.mapid);
             this.setPoint(lnglat, true);
             this.initFlag = true;
+            this.map.addEventListener('click',(e)=>{
+                if(e.lnglat){
+                    this.setPoint(e.lnglat)
+                    this.getLocation()
+                }
+            })
         },
         /** 从url上获取参数取代props参数 */
         initUrlParams() {
@@ -354,11 +385,17 @@ export default {
             const T = window.T;
             this.lnglat = lnglat;
             if (moveCenter) {
-                const offsetCenter = new T.LngLat(
-                    lnglat.lng + this.options.centerOffset[0],
-                    lnglat.lat + this.options.centerOffset[1]
-                );
+                let offLng = this.options.centerOffset[0]||0;
+                let offLat = this.options.centerOffset[1]||0;
                 const zoom = this.map?.getZoom()||this.currentZoom
+                const offsetRateMaps = this.options.offsetRateMaps
+                const rate = offsetRateMaps[zoom]||1
+                offLng = offLng*rate
+                offLat = offLat*rate
+                const offsetCenter = new T.LngLat(
+                    lnglat.lng + Number(offLng.toFixed(6)),
+                    lnglat.lat + Number(offLat.toFixed(6))
+                );
                 this.map.centerAndZoom(offsetCenter, zoom);
             }
             if (!marker) {

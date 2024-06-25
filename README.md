@@ -52,6 +52,7 @@ body {
 |属性|类型|说明|默认值|
 |--|--|--|--|
 |value|string|v-model绑定值，是一个逗号分割的lonLat字符串|无|
+|coordType|string|提交的时候额外提交一个坐标系|gcj02|
 |tk|string|天地图key|无|
 |minZoom|number|最小缩放|3|
 |maxZoom|number|最大缩放|18|
@@ -59,6 +60,7 @@ body {
 |hotTitle|string|热门标题|热门搜索：|
 |hotKeywords|array|热门搜索词列表|["学校", "小区"]|
 |centerOffset|array|地图中心视野偏移|[0, -0.05]|
+|offsetRateMaps|object|根据zoom和偏移值系数计算视野中心|默认在常见手机尺寸下不需要修改|
 |placeholder|string|搜索框提示|请输入关键词搜索或移动定位点|
 |noData|string|无数据提示|暂无数据，请搜索关键词。|
 |color|string|主颜色|#1890ff|
@@ -83,3 +85,49 @@ body {
 |distance|number|如果有startLonlat和当前点位的距离，单位千米|
 |duration|number|如果有startLonlat和当前点位的常规行车时长|
 |routes|object|如果有startLonlat和当前点位的线路|
+|gcj02|string|如果coordType=gcj02，就会附带这个坐标系参数|
+|bd09|string|如果coordType=bd09，就会附带这个坐标系参数|
+
+### 小程序webview模式
+```html
+<template>
+	<view>
+		<web-view :src="currentUrl" @message="onMessage"></web-view>
+	</view>
+</template>
+
+<script>
+const host = 'http://192.168.0.55:8080/?mode=webview'
+export default {
+	data() {
+		return {
+			currentUrl: '',
+			startLonlat: '',
+			locationType: ''
+		};
+	},
+	onLoad(options) {
+		let url = host;
+		this.locationType = options.locationType || 'start'
+		if (options.startLonlat) {
+			url = host + `&startLonlat=${options.startLonlat}`
+		}
+		if (options.value) {
+			url = host + `&value=${options.value}`
+		}
+		this.currentUrl = url;
+	},
+	methods: {
+		onMessage({ detail }) {
+      // 在这个事件里接收提交数据
+			console.log(detail, 'onMessage')
+			if (detail.data) {
+				const data = detail.data[0]
+				this.$store.dispatch('order/SET_ORDER_POINT', { data, type: this.locationType })
+			}
+
+		}
+	}
+}
+</script>
+```
