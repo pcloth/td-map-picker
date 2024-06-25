@@ -110,10 +110,10 @@ export default {
 		let url = host;
 		this.locationType = options.locationType || 'start'
 		if (options.startLonlat) {
-			url = host + `&startLonlat=${options.startLonlat}`
+			url = url + `&startLonlat=${options.startLonlat}`
 		}
 		if (options.value) {
-			url = host + `&value=${options.value}`
+			url = url + `&value=${options.value}`
 		}
 		this.currentUrl = url;
 	},
