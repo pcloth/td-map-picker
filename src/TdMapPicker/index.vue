@@ -1,22 +1,22 @@
 <template>
     <div class="td_map_picker">
         <div class="td_map" :id="mapid"></div>
-        <div class="td_map_popup" @click="hidePopup=false" :class="{
-            mini:hidePopup
+        <div class="td_map_popup" @click="hidePopup = false" :class="{
+            mini: hidePopup
         }">
             <div class="tips" v-if="currentPoint">
                 <div class="submit_box">
-                    <span>{{currentPoint.name}}</span>
-                    <span>{{currentPoint.lonlat}}</span>
+                    <span>{{ currentPoint.name }}</span>
+                    <span>{{ currentPoint.lonlat }}</span>
                 </div>
                 <!-- currentPoint.lonlat -->
                 <div class="submit_button" :class="{
                     td_disabled: submitDisabled
                 }" @click.stop="submitPoint">确定</div>
             </div>
-            <div class="hide_popup_button" @click.stop="hidePopup=!hidePopup">
+            <div class="hide_popup_button" @click.stop="hidePopup = !hidePopup">
                 <img class="arrow_icon" :class="{
-                    flip:hidePopup
+                    flip: hidePopup
                 }" src="./images/arrow.png" alt="">
             </div>
             <div class="td_search_box">
@@ -24,28 +24,30 @@
             </div>
             <template v-if="!hidePopup">
                 <div class="hot_keywords">
-                    <label>{{options.hotTitle}}</label>
-                    <div @click="setWord(item)" class="hot_keyword" v-for="item,idx in options.hotKeywords" :key="idx">{{item}}</div>
+                    <label>{{ options.hotTitle }}</label>
+                    <div @click="setWord(item)" class="hot_keyword" v-for="item, idx in options.hotKeywords" :key="idx">
+                        {{ item }}</div>
                 </div>
                 <div class="td_address_list">
                     <div class="td_not_data" v-if="!pointsList.length">
-                        {{noData}}
+                        {{ noData }}
                     </div>
                     <template v-else>
-                        <div class="td_address" @click="selectPoint(item)" v-for="item,idx in pointsList" :key="item.hotPointID">
-                            <span class="index">{{idx+1}}</span>
+                        <div class="td_address" @click="selectPoint(item)" v-for="item, idx in pointsList"
+                            :key="item.hotPointID">
+                            <span class="index">{{ idx + 1 }}</span>
                             <div class="td_add_content">
-                                <span class="name">{{item.name}}</span>
-                                <span class="address">{{item.address}}</span>
+                                <span class="name">{{ item.name }}</span>
+                                <span class="address">{{ item.address }}</span>
                             </div>
                         </div>
                         <div class="pagination">
                             <div class="pagination_button" :class="{
-                            td_disabled:currentPage<=1
-                        }" @click="gotoPage(-1)">上一页</div>
+                                td_disabled: currentPage <= 1
+                            }" @click="gotoPage(-1)">上一页</div>
                             <div class="pagination_button" :class="{
-                            td_disabled:allpage<=currentPage
-                        }" @click="gotoPage(+1)">下一页</div>
+                                td_disabled: allpage <= currentPage
+                            }" @click="gotoPage(+1)">下一页</div>
                         </div>
                     </template>
                 </div>
@@ -62,23 +64,23 @@ let marker = null;
 
 const props = {
     // 传入坐标wgs84
-    value:{
-        type:String,
-        default:""
+    value: {
+        type: String,
+        default: ""
     },
     /** submit提交的坐标系:
      * gcj02:国测局坐标系
      * wgs84:国际坐标系
      * bd09:百度坐标系
      */
-    coordType:{
-        type:String,
-        default:"wgs84"
+    coordType: {
+        type: String,
+        default: "wgs84"
     },
     /** 坐标系输出精度 */
-    decimals:{
-        type:Number,
-        default:6
+    decimals: {
+        type: Number,
+        default: 6
     },
     /** 地图key */
     tk: {
@@ -117,42 +119,42 @@ const props = {
             return [0, -0.05];
         },
     },
-    offsetRateMaps:{
-        type:Object,
-        default(){
+    offsetRateMaps: {
+        type: Object,
+        default() {
             return {
-                1:1200,
-                2:800,
-                3:500,
-                4:280,
-                5:100,
-                6:45,
-                7:35,
-                8:25,
-                9:15,
-                10:4,
-                11:1.5,
-                12:1,
-                13:0.5555555556,
-                14:0.3333333333,
-                15:0.1666666667,
-                16:0.0833333333,
-                17:0.0416666667,
-                18:0.0208333333,
+                1: 1200,
+                2: 800,
+                3: 500,
+                4: 280,
+                5: 100,
+                6: 45,
+                7: 35,
+                8: 25,
+                9: 15,
+                10: 4,
+                11: 1.5,
+                12: 1,
+                13: 0.5555555556,
+                14: 0.3333333333,
+                15: 0.1666666667,
+                16: 0.0833333333,
+                17: 0.0416666667,
+                18: 0.0208333333,
             }
         }
     },
-    placeholder:{
-        type:String,
-        default:"请输入关键词搜索或移动定位点"
+    placeholder: {
+        type: String,
+        default: "请输入关键词搜索或移动定位点"
     },
-    noData:{
-        type:String,
-        default:"暂无数据，请搜索关键词。"
+    noData: {
+        type: String,
+        default: "暂无数据，请搜索关键词。"
     },
-    color:{
-        type:String,
-        default:"#1890ff"
+    color: {
+        type: String,
+        default: "#1890ff"
     },
     /**
      * 使用模式
@@ -177,9 +179,9 @@ const props = {
         type: Number,
         default: 1,
     },
-    defaultHide:{
-        type:Boolean,
-        default:false
+    defaultHide: {
+        type: Boolean,
+        default: false
     }
 };
 export default {
@@ -202,26 +204,22 @@ export default {
             total: 0,
             hidePopup: this.defaultHide,
             routeLoadFlag: true,
-            loadWxSdkFlag:false,
+            loadWxSdkFlag: false,
         };
     },
-    watch:{
-        value(){
+    watch: {
+        value() {
             this.changeValue(this.value)
-        },
-        lnglat(){
-            const strLonLat = this.lnglat.lng + "," + this.lnglat.lat;
-            // this.$emit('input',strLonLat)
         }
     },
-    computed:{
-        submitDisabled(){
+    computed: {
+        submitDisabled() {
             // 线路加载
-            if(!this.routeLoadFlag) return true;
+            if (!this.routeLoadFlag) return true;
             // 点位获取
-            if(!this.currentPoint) return true;
+            if (!this.currentPoint) return true;
             // 如果是webview小程序sdk加载状态
-            if(this.options.mode==='webview' && !this.loadWxSdkFlag) return true;
+            if (this.options.mode === 'webview' && !this.loadWxSdkFlag) return true;
             return false;
         }
     },
@@ -251,16 +249,16 @@ export default {
                 this.initOnload();
             };
         },
-        loadWxsdk(){
+        loadWxsdk() {
             // document.write('<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"><\/script>');
-            if(window.wx){
+            if (window.wx) {
                 return
             }
             const script = document.createElement("script");
             script.type = "text/javascript";
             script.src = "https://res.wx.qq.com/open/js/jweixin-1.4.0.js";
             script.onerror = (e) => {
-                alert('微信sdk加载失败'+JSON.stringify(e))
+                alert('微信sdk加载失败' + JSON.stringify(e))
             };
             document.head.appendChild(script);
             script.onload = () => {
@@ -268,46 +266,46 @@ export default {
                 this.loadWxSdkFlag = true;
             };
         },
-        round(number,decimals=this.decimals){
-            const rate = Math.pow(10,decimals)
-            return Math.round(number*rate)/rate
+        round(number, decimals = this.decimals) {
+            const rate = Math.pow(10, decimals)
+            return Math.round(number * rate) / rate
         },
-        lonlatToCoordType(lonlat, coordType=this.coordType){
+        lonlatToCoordType(lonlat, coordType = this.coordType) {
             const g = lonlat.split(",");
-            let value = [g[0],g[1]] 
-            if(coordType==='gcj02'){
-                value = coord.wgs84togcj02(g[0],g[1])
-            } else if(coordType==='bd09'){
-                value = coord.wgs84togcj02(g[0],g[1])
-                value = coord.gcj02tobd09(value[0],value[1])
-            } else if(coordType==='wgs84'){
+            let value = [g[0], g[1]]
+            if (coordType === 'gcj02') {
+                value = coord.wgs84togcj02(g[0], g[1])
+            } else if (coordType === 'bd09') {
+                value = coord.wgs84togcj02(g[0], g[1])
+                value = coord.gcj02tobd09(value[0], value[1])
+            } else if (coordType === 'wgs84') {
                 // 天地图和wgs84非常接近
             } else {
                 console.error('未知的坐标系')
             }
-            return value.map(v=>this.round(v))
+            return value.map(v => this.round(v))
         },
-        coordTypeToLonlat(lonlat, coordType=this.coordType){
+        coordTypeToLonlat(lonlat, coordType = this.coordType) {
             const g = lonlat.split(",");
-            let value = [g[0],g[1]] 
-            if(coordType==='gcj02'){
-                value = coord.gcj02towgs84(g[0],g[1])
-            } else if(coordType==='bd09'){
-                value = coord.bd09togcj02(g[0],g[1])
-                value = coord.gcj02towgs84(value[0],value[1])
-            } else if(coordType==='wgs84'){
+            let value = [g[0], g[1]]
+            if (coordType === 'gcj02') {
+                value = coord.gcj02towgs84(g[0], g[1])
+            } else if (coordType === 'bd09') {
+                value = coord.bd09togcj02(g[0], g[1])
+                value = coord.gcj02towgs84(value[0], value[1])
+            } else if (coordType === 'wgs84') {
                 // 天地图和wgs84非常接近
             } else {
                 console.error('未知的坐标系')
             }
-            return value.map(v=>this.round(v))
+            return value.map(v => this.round(v))
         },
-        changeValue(value){
-            if(!window.T){
-                setTimeout(()=>{
+        changeValue(value) {
+            if (!window.T || !this.initFlag) {
+                setTimeout(() => {
                     this.changeValue(value)
-                },500)
-                return 
+                }, 500)
+                return
             }
             const g = this.coordTypeToLonlat(value);
             this.lnglat = new window.T.LngLat(g[0], g[1]);
@@ -316,9 +314,9 @@ export default {
         },
         initOnload() {
             this.initMapInstance();
-            if(this.value){
+            if (this.value) {
                 this.changeValue(this.value)
-            }else{
+            } else {
                 this.getGeoPoint();
             }
         },
@@ -330,8 +328,8 @@ export default {
             this.map = new T.Map(this.mapid);
             this.setPoint(lnglat, true);
             this.initFlag = true;
-            this.map.addEventListener('click',(e)=>{
-                if(e.lnglat){
+            this.map.addEventListener('click', (e) => {
+                if (e.lnglat) {
                     this.setPoint(e.lnglat, true)
                     this.getLocation()
                 }
@@ -339,6 +337,8 @@ export default {
         },
         /** 从url上获取参数取代props参数 */
         initUrlParams() {
+            marker = null;
+            searchObj = null;
             let url = new URL(window.location.href);
             // 获取所有的参数覆盖到options上
             url.searchParams.forEach((value, key) => {
@@ -354,7 +354,7 @@ export default {
             });
             this.currentZoom = this.options.zoom;
             this.hidePopup = this.options.defaultHide;
-            if(this.options.value){
+            if (this.options.value) {
                 this.changeValue(this.options.value)
             }
             // 将color参数写入css变量
@@ -362,7 +362,7 @@ export default {
                 "--td_map_picker_color",
                 this.options.color
             );
-            if(this.options.mode==='webview'){
+            if (this.options.mode === 'webview') {
                 this.loadWxsdk()
             }
         },
@@ -388,13 +388,13 @@ export default {
             const T = window.T;
             this.lnglat = lnglat;
             if (moveCenter) {
-                let offLng = this.options.centerOffset[0]||0;
-                let offLat = this.options.centerOffset[1]||0;
-                const zoom = this.map?.getZoom()||this.currentZoom
+                let offLng = this.options.centerOffset[0] || 0;
+                let offLat = this.options.centerOffset[1] || 0;
+                const zoom = this.map?.getZoom() || this.currentZoom
                 const offsetRateMaps = this.options.offsetRateMaps
-                const rate = offsetRateMaps[zoom]||1
-                offLng = offLng*rate
-                offLat = offLat*rate
+                const rate = offsetRateMaps[zoom] || 1
+                offLng = offLng * rate
+                offLat = offLat * rate
                 const offsetCenter = new T.LngLat(
                     lnglat.lng + Number(offLng.toFixed(6)),
                     lnglat.lat + Number(offLat.toFixed(6))
@@ -422,7 +422,7 @@ export default {
             const T = window.T;
             if (!searchObj) {
                 searchObj = new T.LocalSearch(this.map, {
-                    pageCapacity:5,
+                    pageCapacity: 5,
                     onSearchComplete: (result) => {
                         this.searchOnResult(result);
                     },
@@ -549,7 +549,7 @@ export default {
             if (wx && wx.miniProgram) {
                 wx.miniProgram.postMessage({ data: this.currentPoint });
                 wx.miniProgram.navigateBack();
-            }else{
+            } else {
                 alert('请在小程序环境中使用webview')
             }
         },
@@ -557,7 +557,7 @@ export default {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.currentPoint.lonlat = value
             this.currentPoint.coordType = this.coordType
-            console.log('提交',this.currentPoint)
+            // console.log('提交', this.currentPoint)
             this.$emit("submit", this.currentPoint);
             this.$emit("input", value);
             if (this.options.mode === "webview") {
@@ -619,6 +619,7 @@ export default {
     0% {
         height: var(--pop-full-height);
     }
+
     100% {
         height: var(--pop-mini-height);
     }
@@ -628,6 +629,7 @@ export default {
     0% {
         height: var(--pop-mini-height);
     }
+
     100% {
         height: var(--pop-full-height);
     }
@@ -649,6 +651,7 @@ export default {
     /* 激活时边框蓝色 */
     outline: none;
 }
+
 /* 激活时边框蓝色 */
 .td_search_input:focus {
     border-color: var(--td_map_picker_color);
@@ -706,6 +709,7 @@ export default {
     justify-content: center;
     margin-top: 0.4rem;
 }
+
 .pagination_button {
     margin: 0 0.2rem;
     color: var(--td_map_picker_color);
@@ -763,6 +767,7 @@ export default {
     flex-direction: column;
     width: calc(100% - 80px);
 }
+
 .submit_box span {
     width: 100%;
     white-space: nowrap;
@@ -797,6 +802,7 @@ export default {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(180deg);
     }

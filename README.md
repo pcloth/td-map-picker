@@ -52,7 +52,7 @@ body {
 |属性|类型|说明|默认值|
 |--|--|--|--|
 |value|string|v-model绑定，只有在确定按钮点击后才提交input事件。值是一个逗号分割的lonLat字符串|无|
-|coordType|string|指定value的坐标系|wgs84|
+|coordType|string|指定value的坐标系，支持gcj02、wgs84、bd09三种格式|wgs84|
 |decimals|number|坐标保持的精度|6|
 |tk|string|天地图key|无|
 |minZoom|number|最小缩放|3|
