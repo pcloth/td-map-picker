@@ -20,7 +20,7 @@
                 }" src="./images/arrow.png" alt="">
             </div>
             <div class="td_search_box">
-                <input v-model="searchWord" @change="searchMap" class="td_search_input" :placeholder="placeholder" />
+                <input v-model="searchWord" @change="searchMap" class="td_search_input" :placeholder="options.placeholder" />
             </div>
             <template v-if="!hidePopup">
                 <div class="hot_keywords">
@@ -30,7 +30,7 @@
                 </div>
                 <div class="td_address_list">
                     <div class="td_not_data" v-if="!pointsList.length">
-                        {{ noData }}
+                        {{ options.noData }}
                     </div>
                     <template v-else>
                         <div class="td_address" @click="selectPoint(item)" v-for="item, idx in pointsList"
@@ -266,12 +266,14 @@ export default {
                 this.loadWxSdkFlag = true;
             };
         },
-        round(number, decimals = this.decimals) {
+        round(number) {
+            const decimals = this.options.decimals
             const rate = Math.pow(10, decimals)
             return Math.round(number * rate) / rate
         },
-        lonlatToCoordType(lonlat, coordType = this.coordType) {
+        lonlatToCoordType(lonlat) {
             const g = lonlat.split(",");
+            const coordType = this.options.coordType
             let value = [g[0], g[1]]
             if (coordType === 'gcj02') {
                 value = coord.wgs84togcj02(g[0], g[1])
@@ -285,7 +287,8 @@ export default {
             }
             return value.map(v => this.round(v))
         },
-        coordTypeToLonlat(lonlat, coordType = this.coordType) {
+        coordTypeToLonlat(lonlat) {
+            const coordType = this.options.coordType
             const g = lonlat.split(",");
             let value = [g[0], g[1]]
             if (coordType === 'gcj02') {
@@ -325,7 +328,10 @@ export default {
             if (!lnglat) {
                 lnglat = new T.LngLat(116.404, 39.915);
             }
-            this.map = new T.Map(this.mapid);
+            this.map = new T.Map(this.mapid,{
+                minZoom: this.options.minZoom,
+                maxZoom: this.options.maxZoom,
+            });
             this.setPoint(lnglat, true);
             this.initFlag = true;
             this.map.addEventListener('click', (e) => {
@@ -556,7 +562,7 @@ export default {
         submitPoint() {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.currentPoint.lonlat = value
-            this.currentPoint.coordType = this.coordType
+            this.currentPoint.coordType = this.options.coordType
             // console.log('提交', this.currentPoint)
             this.$emit("submit", this.currentPoint);
             this.$emit("input", value);
