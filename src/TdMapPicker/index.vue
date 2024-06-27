@@ -4,6 +4,9 @@
         <div class="td_map_popup" @click="hidePopup = false" :class="{
             mini: hidePopup
         }">
+            <div class="my_location" @click.stop="getGeoPoint">
+                <img class="location_icon" src="./images/location.png" alt="">
+            </div>
             <div class="tips" v-if="currentPoint">
                 <div class="submit_box">
                     <span>{{ currentPoint.name }}</span>
@@ -766,6 +769,29 @@ export default {
     align-items: center;
     justify-content: space-between;
     border-radius: 0.2rem;
+}
+
+.my_location {
+    position: absolute;
+    top: -90px;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 0.2rem;
+    color: var(--td_map_picker_color);
+    /* 阴影 */
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1);
+}
+
+.my_location:active {
+    background: #f0f0f0;
+}
+
+.location_icon {
+    width: 20px;
 }
 
 .submit_box {
