@@ -17,7 +17,7 @@ export default {
   data(){
     return {
         mapkey,
-        value:'106.50421,29.61973'
+        value:''
     }
   }
 }

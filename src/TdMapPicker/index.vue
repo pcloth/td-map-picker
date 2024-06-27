@@ -9,6 +9,7 @@
                     <span>{{currentPoint.name}}</span>
                     <span>{{currentPoint.lonlat}}</span>
                 </div>
+                <!-- currentPoint.lonlat -->
                 <div class="submit_button" :class="{
                     td_disabled: submitDisabled
                 }" @click.stop="submitPoint">确定</div>
@@ -72,7 +73,12 @@ const props = {
      */
     coordType:{
         type:String,
-        default:"gcj02"
+        default:"wgs84"
+    },
+    /** 坐标系输出精度 */
+    decimals:{
+        type:Number,
+        default:6
     },
     /** 地图key */
     tk: {
@@ -205,7 +211,7 @@ export default {
         },
         lnglat(){
             const strLonLat = this.lnglat.lng + "," + this.lnglat.lat;
-            this.$emit('input',strLonLat)
+            // this.$emit('input',strLonLat)
         }
     },
     computed:{
@@ -262,6 +268,10 @@ export default {
                 this.loadWxSdkFlag = true;
             };
         },
+        round(number,decimals=this.decimals){
+            const rate = Math.pow(10,decimals)
+            return Math.round(number*rate)/rate
+        },
         lonlatToCoordType(lonlat, coordType=this.coordType){
             const g = lonlat.split(",");
             let value = [g[0],g[1]] 
@@ -275,7 +285,7 @@ export default {
             } else {
                 console.error('未知的坐标系')
             }
-            return value.map(v=>v.toFixed(6))
+            return value.map(v=>this.round(v))
         },
         coordTypeToLonlat(lonlat, coordType=this.coordType){
             const g = lonlat.split(",");
@@ -290,7 +300,7 @@ export default {
             } else {
                 console.error('未知的坐标系')
             }
-            return value.map(v=>v.toFixed(6))
+            return value.map(v=>this.round(v))
         },
         changeValue(value){
             if(!window.T){
@@ -299,13 +309,7 @@ export default {
                 },500)
                 return 
             }
-            // console.log(this.coordTypeToLonlat(value),'test',value)
-            // const g = this.coordTypeToLonlat(value);
-            // console.log(g,'test',value)
-            // if(!g){
-            //     return
-            // }
-            const g = value.split(",");
+            const g = this.coordTypeToLonlat(value);
             this.lnglat = new window.T.LngLat(g[0], g[1]);
             this.setPoint(this.lnglat);
             this.getLocation();
@@ -328,7 +332,7 @@ export default {
             this.initFlag = true;
             this.map.addEventListener('click',(e)=>{
                 if(e.lnglat){
-                    this.setPoint(e.lnglat)
+                    this.setPoint(e.lnglat, true)
                     this.getLocation()
                 }
             })
@@ -369,8 +373,7 @@ export default {
             return new Promise((resolve, reject) => {
                 const geolocation = new T.Geolocation();
                 geolocation.getCurrentPosition(function (result) {
-                    this.lnglat = result.lnglat;
-                    // that.setPoint(result.lnglat, true);
+                    that.setPoint(result.lnglat, true);
                     that.getLocation();
                     resolve(result);
                 });
@@ -551,9 +554,12 @@ export default {
             }
         },
         submitPoint() {
+            const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
+            this.currentPoint.lonlat = value
+            this.currentPoint.coordType = this.coordType
             console.log('提交',this.currentPoint)
-            this.currentPoint[this.coordType] = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.$emit("submit", this.currentPoint);
+            this.$emit("input", value);
             if (this.options.mode === "webview") {
                 this.submitMPWebview();
             }

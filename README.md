@@ -51,8 +51,9 @@ body {
 
 |属性|类型|说明|默认值|
 |--|--|--|--|
-|value|string|v-model绑定值，是一个逗号分割的lonLat字符串|无|
-|coordType|string|提交的时候额外提交一个坐标系|gcj02|
+|value|string|v-model绑定，只有在确定按钮点击后才提交input事件。值是一个逗号分割的lonLat字符串|无|
+|coordType|string|指定value的坐标系|wgs84|
+|decimals|number|坐标保持的精度|6|
 |tk|string|天地图key|无|
 |minZoom|number|最小缩放|3|
 |maxZoom|number|最大缩放|18|
@@ -79,14 +80,14 @@ body {
 |--|--|--|
 |name|string|点位的名字|
 |address|string|点位的地址|
+|coordType|string|当前lonlat的坐标系|
 |lonlat|string|点位的坐标|
 |addressComponent|object|点位逆地址解析数据|
 |startLonlat|string|如果传入了startLonlat，提交的时候回传回来|
 |distance|number|如果有startLonlat和当前点位的距离，单位千米|
 |duration|number|如果有startLonlat和当前点位的常规行车时长|
 |routes|object|如果有startLonlat和当前点位的线路|
-|gcj02|string|如果coordType=gcj02，就会附带这个坐标系参数|
-|bd09|string|如果coordType=bd09，就会附带这个坐标系参数|
+
 
 ### 小程序webview模式
 ```html
