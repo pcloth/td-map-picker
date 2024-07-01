@@ -250,7 +250,7 @@ export default {
             }
             this.log('加载地图sdk')
             script.type = "text/javascript";
-            script.src = `http://api.tianditu.gov.cn/api?v=${apiVer}&tk=${tk}`;
+            script.src = `//api.tianditu.gov.cn/api?v=${apiVer}&tk=${tk}`;
             script.onerror = (e) => {
                 this.log("地图加载失败", e);
             };
@@ -267,7 +267,7 @@ export default {
             this.log('加载微信sdk')
             const script = document.createElement("script");
             script.type = "text/javascript";
-            script.src = "https://res.wx.qq.com/open/js/jweixin-1.4.0.js";
+            script.src = "//res.wx.qq.com/open/js/jweixin-1.4.0.js";
             script.onerror = (e) => {
                 alert('微信sdk加载失败' + JSON.stringify(e))
             };
