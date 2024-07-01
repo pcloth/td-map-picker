@@ -7,10 +7,12 @@
             <div class="my_location" @click.stop="getGeoPoint">
                 <img class="location_icon" src="./images/location.png" alt="">
             </div>
-            <div class="tips" v-if="currentPoint">
+            <div class="tips" >
                 <div class="submit_box">
-                    <span>{{ currentPoint.name }}</span>
-                    <span>{{ currentPoint.lonlat }}</span>
+                    <template v-if="currentPoint">
+                        <span>{{ currentPoint.name }}</span>
+                        <span>{{ currentPoint.lonlat }}</span>
+                    </template>
                 </div>
                 <!-- currentPoint.lonlat -->
                 <div class="submit_button" :class="{
@@ -185,6 +187,10 @@ const props = {
     defaultHide: {
         type: Boolean,
         default: false
+    },
+    debug:{
+        type: Boolean,
+        default: false
     }
 };
 export default {
@@ -242,10 +248,11 @@ export default {
             if (!tk) {
                 throw "请配置tk参数";
             }
+            this.log('加载地图sdk')
             script.type = "text/javascript";
             script.src = `http://api.tianditu.gov.cn/api?v=${apiVer}&tk=${tk}`;
             script.onerror = (e) => {
-                console.error("地图加载失败", e);
+                this.log("地图加载失败", e);
             };
             document.head.appendChild(script);
             script.onload = () => {
@@ -257,6 +264,7 @@ export default {
             if (window.wx) {
                 return
             }
+            this.log('加载微信sdk')
             const script = document.createElement("script");
             script.type = "text/javascript";
             script.src = "https://res.wx.qq.com/open/js/jweixin-1.4.0.js";
@@ -348,9 +356,9 @@ export default {
         initUrlParams() {
             marker = null;
             searchObj = null;
-            let url = new URL(window.location.href);
-            // 获取所有的参数覆盖到options上
-            url.searchParams.forEach((value, key) => {
+            // 解析url参数
+            window.location.href.split('?').pop().split('&').forEach(item => {
+                let [key, value] = item.split('=')
                 const propsConf = props[key];
                 if (propsConf) {
                     if ([Array, Object, Boolean].includes(propsConf.type)) {
@@ -359,10 +367,11 @@ export default {
                         value = Number(value);
                     }
                 }
-                this.options[key] = value;
-            });
+                this.options[key] = value
+            })
             this.currentZoom = this.options.zoom;
             this.hidePopup = this.options.defaultHide;
+            this.log('url参数', this.options)
             if (this.options.value) {
                 this.changeValue(this.options.value)
             }
@@ -375,6 +384,12 @@ export default {
                 this.loadWxsdk()
             }
         },
+        /** 接管console.log */
+        log(...args) {
+            if (this.options.debug) {
+                console.log(...args)
+            }
+        },
         getGeoPoint() {
             // 获取当前浏览器定位
             let that = this;
@@ -382,16 +397,29 @@ export default {
             return new Promise((resolve, reject) => {
                 const geolocation = new T.Geolocation();
                 geolocation.getCurrentPosition(function (result) {
+                    that.log(result,'获取定位')
+                    if(!result || !result.lnglat){
+                        const msg = '获取定位失败'
+                        that.showMessage(msg)
+                        reject(msg)
+                        return
+                    }
                     that.setPoint(result.lnglat, true);
                     that.getLocation();
                     resolve(result);
                 });
                 setTimeout(() => {
                     if (!this.lnglat) {
-                        reject("获取定位超时");
+                        const msg = '获取定位超时'
+                        that.showMessage(msg)
+                        reject(msg);
                     }
                 }, 8000);
             });
+        },
+        /** 模仿element弹窗信息 */
+        showMessage(msg) {
+            alert(msg);
         },
         setPoint(lnglat, moveCenter = true) {
             const T = window.T;
@@ -566,7 +594,7 @@ export default {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.currentPoint.lonlat = value
             this.currentPoint.coordType = this.options.coordType
-            // console.log('提交', this.currentPoint)
+            this.log('提交', this.options)
             this.$emit("submit", this.currentPoint);
             this.$emit("input", value);
             if (this.options.mode === "webview") {
