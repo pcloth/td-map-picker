@@ -7,7 +7,7 @@
             <div class="my_location" @click.stop="getGeoPoint">
                 <img class="location_icon" src="./images/location.png" alt="">
             </div>
-            <div class="tips" >
+            <div class="tips">
                 <div class="submit_box">
                     <template v-if="currentPoint">
                         <span>{{ currentPoint.name }}</span>
@@ -25,7 +25,8 @@
                 }" src="./images/arrow.png" alt="">
             </div>
             <div class="td_search_box">
-                <input v-model="searchWord" @change="searchMap" class="td_search_input" :placeholder="options.placeholder" />
+                <input v-model="searchWord" @change="searchMap" class="td_search_input"
+                    :placeholder="options.placeholder" />
             </div>
             <template v-if="!hidePopup">
                 <div class="hot_keywords">
@@ -188,7 +189,7 @@ const props = {
         type: Boolean,
         default: false
     },
-    debug:{
+    debug: {
         type: Boolean,
         default: false
     }
@@ -339,7 +340,7 @@ export default {
             if (!lnglat) {
                 lnglat = new T.LngLat(116.404, 39.915);
             }
-            this.map = new T.Map(this.mapid,{
+            this.map = new T.Map(this.mapid, {
                 minZoom: this.options.minZoom,
                 maxZoom: this.options.maxZoom,
             });
@@ -397,8 +398,8 @@ export default {
             return new Promise((resolve, reject) => {
                 const geolocation = new T.Geolocation();
                 geolocation.getCurrentPosition(function (result) {
-                    that.log(result,'获取定位')
-                    if(!result || !result.lnglat){
+                    that.log(result, '获取定位')
+                    if (!result || !result.lnglat) {
                         const msg = '获取定位失败'
                         that.showMessage(msg)
                         reject(msg)
@@ -503,7 +504,7 @@ export default {
                 poiType: "101"
                 source: "0" 
             */
-            // this.currentPoint = item;
+            this.log(item, '选中')
             this.setCurrentPoint({
                 name: item.name,
                 address: item.address,
@@ -511,7 +512,7 @@ export default {
                 addressComponent: null,
             });
             this.setPoint(new T.LngLat(g[0], g[1]));
-            // this.setPoint(new T.LngLat(item.point.lng, item.point.lat))
+            this.getLocation();
         },
         // 逆地理编码
         getLocation() {
@@ -594,7 +595,7 @@ export default {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.currentPoint.lonlat = value
             this.currentPoint.coordType = this.options.coordType
-            this.log('提交', this.options)
+            this.log('提交', this.currentPoint)
             this.$emit("submit", this.currentPoint);
             this.$emit("input", value);
             if (this.options.mode === "webview") {
@@ -737,7 +738,7 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 0.5rem;
+    font-size: 0.85rem;
     color: #999;
 }
 
