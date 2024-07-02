@@ -192,6 +192,16 @@ const props = {
     debug: {
         type: Boolean,
         default: false
+    },
+    /** 提交地址的时候，名称优先使用兴趣点名称 */
+    usePoi:{
+        type:Boolean,
+        default:false
+    },
+    /** 优先使用兴趣点时候，这个范围内的兴趣点才能被使用 */
+    poiDistance:{
+        type:Number,
+        default:30
     }
 };
 export default {
@@ -512,20 +522,31 @@ export default {
                 addressComponent: null,
             });
             this.setPoint(new T.LngLat(g[0], g[1]));
-            this.getLocation();
+            this.getLocation(true);
         },
         // 逆地理编码
-        getLocation() {
+        getLocation(coverAddressComponent) {
             const T = window.T;
             const geocode = new T.Geocoder();
             const that = this;
             geocode.getLocation(that.lnglat, function (result) {
-                that.setCurrentPoint({
-                    name: result.formatted_address,
-                    address: result.formatted_address,
-                    lonlat: that.lnglat.lng + "," + that.lnglat.lat,
-                    addressComponent: result.addressComponent,
-                });
+                const name = that.getPointName(result);
+                if(coverAddressComponent){
+                    that.setCurrentPoint({
+                        name: name,
+                        address: result.formatted_address,
+                        lonlat: that.lnglat.lng + "," + that.lnglat.lat,
+                        ...that.currentPoint,
+                        addressComponent: result.addressComponent,
+                    });
+                }else{
+                    that.setCurrentPoint({
+                        name: name,
+                        address: result.formatted_address,
+                        lonlat: that.lnglat.lng + "," + that.lnglat.lat,
+                        addressComponent: result.addressComponent,
+                    });
+                }
             });
         },
         async setCurrentPoint(data) {
@@ -591,15 +612,27 @@ export default {
                 alert('请在小程序环境中使用webview')
             }
         },
+        getPointName(fullPoint){
+            if(this.options.usePoi){
+                // 使用兴趣点作为定位名称，而不是地址
+                const addressComponent = fullPoint.addressComponent
+                if(addressComponent.poi && addressComponent.poi_distance <= this.options.poiDistance){
+                    return addressComponent.poi
+                }
+            }
+            return fullPoint.address
+        },
         submitPoint() {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.currentPoint.lonlat = value
             this.currentPoint.coordType = this.options.coordType
-            this.log('提交', this.currentPoint)
+            this.currentPoint.name = this.getPointName(this.currentPoint)
+            this.log('提交', this.currentPoint,this.options)
             this.$emit("submit", this.currentPoint);
-            this.$emit("input", value);
             if (this.options.mode === "webview") {
                 this.submitMPWebview();
+            }else{
+                this.$emit("input", value);
             }
         },
     },

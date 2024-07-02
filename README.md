@@ -3,6 +3,13 @@
 
 ## vue 2.6
 
+## 更新日志
+
+#### 0.1.16
+1. 当用户选中搜索列表时，提交点位名称为搜索出来的兴趣点名称。
+2. 添加以兴趣点名称为提交优先名称参数和距离参数。
+
+
 ## 安装
 ```sh
 npm install td-map-picker
@@ -70,6 +77,8 @@ body {
 |drivingPolicy|number|计算距离和线路的策略:0=最少时间、1=最短距离、2=避开高速、3=步行|1|
 |defaultHide|boolen|引入时是否收起信息框|false|
 |debug|boolen|是否开启调试模式，调试模式会console.log输出一些信息，如果在小程序中，需要在webview层再集成vconsole组件。|false|
+|usePoi|boolen|选中地图或者提交的时候，是否以就近兴趣点作为地点名称|false|
+|poiDistance|number|以兴趣点作为名称时，参考距离，如果大于这个距离就使用地址作为名称|30|
 
 ### 事件
 |事件|参数|说明|
