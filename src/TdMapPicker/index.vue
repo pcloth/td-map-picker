@@ -202,7 +202,7 @@ const props = {
     poiDistance:{
         type:Number,
         default:30
-    }
+    },
 };
 export default {
     name: "td-map-picker",
@@ -371,6 +371,8 @@ export default {
             window.location.href.split('?').pop().split('&').forEach(item => {
                 let [key, value] = item.split('=')
                 const propsConf = props[key];
+                // base64解码
+                value = decodeURIComponent(value)
                 if (propsConf) {
                     if ([Array, Object, Boolean].includes(propsConf.type)) {
                         value = JSON.parse(value);
@@ -646,7 +648,7 @@ export default {
     position: relative;
     --pop-mini-height: 4.4rem;
     --pop-full-height: 23.2rem;
-    --font-size: 0.9rem;
+    --font-size: 0.95rem;
 }
 
 .td_map {
@@ -747,6 +749,7 @@ export default {
 .td_add_content {
     display: flex;
     flex-direction: column;
+    width: calc(100% - 1.2rem - 10px);
 }
 
 .td_address .index {
@@ -771,7 +774,7 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 0.85rem;
+    font-size: var(--font-size);
     color: #999;
 }
 
