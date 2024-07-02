@@ -622,7 +622,7 @@ export default {
                     return addressComponent.poi
                 }
             }
-            return fullPoint.address
+            return fullPoint.name||fullPoint.address
         },
         submitPoint() {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
