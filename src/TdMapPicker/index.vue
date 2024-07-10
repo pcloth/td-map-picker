@@ -573,7 +573,7 @@ export default {
             let drives = {};
             if (startLonlat) {
                 drives = await this.getDrivingRoute(
-                    startLonlat,
+                    this.coordTypeToLonlat(startLonlat).join(','),
                     data.lonlat,
                     drivingPolicy
                 );
