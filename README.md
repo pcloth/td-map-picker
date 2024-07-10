@@ -5,6 +5,9 @@
 
 ## 更新日志
 
+#### 0.1.20
+1. 添加showRoute显示路线配置
+
 #### 0.1.16
 1. 当用户选中搜索列表时，提交点位名称为搜索出来的兴趣点名称。
 2. 添加以兴趣点名称为提交优先名称参数和距离参数。
@@ -74,6 +77,7 @@ body {
 |color|string|主颜色|#1890ff|
 |mode|string|模式，可选项：webview 小程序webview模式，提交后，返回到小程序里面；picker 选择模式，提交后，返回到父组件|picker|
 |startLonlat|string|开始坐标字符串，用逗号分割lon,lat，如果传入了这个，将会返回距离|无|
+|showRoute|boolean|是否显示路线|false|
 |drivingPolicy|number|计算距离和线路的策略:0=最少时间、1=最短距离、2=避开高速、3=步行|1|
 |defaultHide|boolen|引入时是否收起信息框|false|
 |debug|boolen|是否开启调试模式，调试模式会console.log输出一些信息，如果在小程序中，需要在webview层再集成vconsole组件。|false|

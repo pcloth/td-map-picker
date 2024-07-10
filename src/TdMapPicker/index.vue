@@ -7,6 +7,13 @@
             <div class="my_location" @click.stop="getGeoPoint">
                 <img class="location_icon" src="./images/location.png" alt="">
             </div>
+            <div class="route_plans" v-if="planCount && options.showRoute">
+                <div class="route_plan_btn" 
+                    @click.stop="showPlan(plan)"
+                    v-for="plan,planIndex in routePlans" :key="`plan${planIndex}`">
+                    线路{{ planIndex+1 }}({{ plan.distance }}km)
+                </div>
+            </div>
             <div class="tips">
                 <div class="submit_box">
                     <template v-if="currentPoint">
@@ -176,6 +183,11 @@ const props = {
         type: String,
         default: "",
     },
+    /** 是否显示线路 */
+    showRoute:{
+        type:Boolean,
+        default:false
+    },
     /** policy：策略常量。常量如下：
         TMAP_DRIVING_POLICY_LEAST_TIME = 0 最少时间
         TMAP_DRIVING_POLICY_LEAST_DISTANCE = 1 最短距离
@@ -225,6 +237,8 @@ export default {
             hidePopup: this.defaultHide,
             routeLoadFlag: true,
             loadWxSdkFlag: false,
+            routePlans:[],
+            planCount:0
         };
     },
     watch: {
@@ -367,6 +381,8 @@ export default {
         initUrlParams() {
             marker = null;
             searchObj = null;
+            this.routePlans = [];
+            this.planCount = 0;
             // 解析url参数
             window.location.href.split('?').pop().split('&').forEach(item => {
                 let [key, value] = item.split('=')
@@ -574,12 +590,15 @@ export default {
         },
         getDrivingRoute(startLonlat, endLonlat, policy) {
             const T = window.T;
-            // const that = this;
+            const that = this;
             return new Promise((resolve) => {
                 const driving = new T.DrivingRoute(this.map, {
                     policy: policy,
                     onSearchComplete: function (result) {
                         const plans = result.getNumPlans();
+                        that.planObj = result;
+                        that.options.showRoute && that.showPlans(result);
+                        that.log('规划线路数量：',plans)
                         if (plans) {
                             const plan = result.getPlan(0);
                             resolve({
@@ -603,6 +622,42 @@ export default {
                     new T.LngLat(endG[0], endG[1])
                 );
             });
+        },
+        /** 显示线路 */
+        showPlans(plans){
+            this.planCount = plans.getNumPlans();
+            if(!this.planCount){return}
+            const routePlans = []
+            for(let i=0;i<this.planCount;i++){
+                routePlans.push(plans.getPlan(i))
+                if(i===0){
+                    this.showPlan(plans.getPlan(i))
+                }
+            }
+            this.routePlans = routePlans;
+        },
+        /** 在地图上绘制线路 */
+        showPlan(plan){
+            const T = window.T;
+            const pointGroup = plan.routes.item.map(row=>{
+                const [lng,lat] = row.turnlatlon.split(',')
+                return new T.LngLat(lng,lat)
+            });
+
+            // const pointGroup = plan.result.routelatlon.split(';').map(row=>{
+            //     const [lng,lat] = row.split(',')
+            //     return new T.LngLat(lng,lat)
+            // });
+            if(this.polyline){
+                this.map.removeOverLay(this.polyline)
+            }
+            this.log('pointGroup',pointGroup)
+            this.polyline = new T.Polyline(pointGroup, {
+                color: "#ff0000",
+                weight: 2,
+                opacity: 0.7,
+            });        
+            this.map.addOverLay(this.polyline);
         },
         /** 检查是否处于小程序环境，调用api返回小程序并提交参数 */
         submitMPWebview() {
@@ -848,6 +903,38 @@ export default {
     border-radius: 0.2rem;
     color: var(--td_map_picker_color);
     /* 阴影 */
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1);
+}
+
+.route_plans {
+    position: absolute;
+    left: 54px;
+    top: -90px;
+    /* background: #fff; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: calc(100% - 54px - 0.4rem);
+    height: 34px;
+    border-radius: 0.2rem;
+    color: var(--td_map_picker_color);
+    /* 阴影 */
+    /* box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1); */
+    
+}
+.route_plan_btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    margin-right: 0.4rem;
+    cursor: pointer;
+    height: 34px;
+    padding: 0 5px;
+    color: var(--td_map_picker_color);
+    /* border: 1px solid var(--td_map_picker_color); */
+    background: #fff;
     box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1);
 }
 
