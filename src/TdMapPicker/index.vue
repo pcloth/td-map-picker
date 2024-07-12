@@ -639,15 +639,14 @@ export default {
         /** 在地图上绘制线路 */
         showPlan(plan){
             const T = window.T;
-            const pointGroup = plan.routes.item.map(row=>{
-                const [lng,lat] = row.turnlatlon.split(',')
-                return new T.LngLat(lng,lat)
-            });
-
-            // const pointGroup = plan.result.routelatlon.split(';').map(row=>{
-            //     const [lng,lat] = row.split(',')
+            // const pointGroup = plan.routes.item.map(row=>{
+            //     const [lng,lat] = row.turnlatlon.split(',')
             //     return new T.LngLat(lng,lat)
             // });
+            const pointGroup = plan.result.routelatlon.split(';').filter(item=>item).map(row=>{
+                const [lng,lat] = row.split(',')
+                return new T.LngLat(lng,lat)
+            });
             if(this.polyline){
                 this.map.removeOverLay(this.polyline)
             }
