@@ -5,6 +5,11 @@
 
 ## 更新日志
 
+#### 0.1.23
+1. 添加城市选择器，方便快速切换搜索城市
+2. 添加字体控制参数
+3. 当有startLonlat点位的时候，显示一个不可拖动的定位点
+
 #### 0.1.22
 1. 修复绘制线路图时候路线不平滑的问题
 
@@ -78,6 +83,7 @@ body {
 |placeholder|string|搜索框提示|请输入关键词搜索或移动定位点|
 |noData|string|无数据提示|暂无数据，请搜索关键词。|
 |color|string|主颜色|#1890ff|
+|fontSize|string|输入框和选择的字体|0.95rem|
 |mode|string|模式，可选项：webview 小程序webview模式，提交后，返回到小程序里面；picker 选择模式，提交后，返回到父组件|picker|
 |startLonlat|string|开始坐标字符串，用逗号分割lon,lat，如果传入了这个，将会返回距离|无|
 |showRoute|boolean|是否显示路线|false|
@@ -86,6 +92,7 @@ body {
 |debug|boolen|是否开启调试模式，调试模式会console.log输出一些信息，如果在小程序中，需要在webview层再集成vconsole组件。|false|
 |usePoi|boolen|选中地图或者提交的时候，是否以就近兴趣点作为地点名称|false|
 |poiDistance|number|以兴趣点作为名称时，参考距离，如果大于这个距离就使用地址作为名称|30|
+|showCity|boolen|是否显示城市选择器|true|
 
 ### 事件
 |事件|参数|说明|
