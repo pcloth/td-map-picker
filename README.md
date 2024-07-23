@@ -2,8 +2,12 @@
 支持vue组件和小程序webview两种模式获取
 
 ## vue 2.6
+[![](https://img.shields.io/npm/dm/td-map-picker)](https://www.npmjs.com/package/td-map-picker)
 
 ## 更新日志
+
+#### 0.1.25
+1. 修复城市选择器的宽度 
 
 #### 0.1.24
 1. 选择城市的时候，切换地图到城市中心点

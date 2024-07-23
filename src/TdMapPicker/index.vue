@@ -1174,9 +1174,8 @@ export default {
     top: 0;
     left: 0;
     z-index: 19999;
-    width: 100vw;
+    width: 100%;
     padding: 0.2rem 0.4rem;
-    width: 100vw;
     height: 0;
     opacity: 0;
     transition: all 0.3s;
@@ -1185,13 +1184,13 @@ export default {
 }
 
 .td_map_city_picker_popup.fullHeight {
-    height: 100vh;
+    height: 100%;
     opacity: 1;
 }
 
 .city_cover {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     position: absolute;
     top: 0;
     left: 0;
@@ -1207,7 +1206,7 @@ export default {
     color: #333;
     box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1);
     top: 2.8rem;
-    height: calc(100vh - 4.8rem);
+    height: calc(100% - 4.8rem);
     width: calc(100% - 2.4rem);
     z-index: 9999;
     overflow: auto;
