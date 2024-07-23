@@ -10,7 +10,7 @@
                 </div>
                 <template v-for="p in cityList" >
                     <div class="city_item" v-if="p.show" :key="p.c">
-                        <div class="city_item_province btn"
+                        <div class="city_item_province picker_btn"
                         :class="{
                             filter_status:p.filterStatus,
                             current_city:cityObj.c === p.c
@@ -20,7 +20,7 @@
                         
                         <div class="city_item_box">
                             <template v-for="c in p.d">
-                                <div class="city btn" :id="c.c" :class="{
+                                <div class="city picker_btn" :id="c.c" :class="{
                                     filter_status:c.filterStatus,
                                     current_city:cityObj.c === c.c
                             }"   @click.stop="setCity(c)" :key="c.c">{{ c.n }}</div>
@@ -1253,7 +1253,7 @@ export default {
     color: var(--td_map_picker_color);
 }
 
-.btn {
+.picker_btn {
     cursor: pointer;
 }
 
