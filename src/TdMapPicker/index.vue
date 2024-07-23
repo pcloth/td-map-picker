@@ -531,22 +531,25 @@ export default {
         showMessage(msg) {
             alert(msg);
         },
+        moveCenter(lnglat){
+            let offLng = this.options.centerOffset[0] || 0;
+            let offLat = this.options.centerOffset[1] || 0;
+            const zoom = this.map?.getZoom() || this.currentZoom
+            const offsetRateMaps = this.options.offsetRateMaps
+            const rate = offsetRateMaps[zoom] || 1
+            offLng = offLng * rate
+            offLat = offLat * rate
+            const offsetCenter = new T.LngLat(
+                lnglat.lng + Number(offLng.toFixed(6)),
+                lnglat.lat + Number(offLat.toFixed(6))
+            );
+            this.map.centerAndZoom(offsetCenter, zoom);
+        },
         setPoint(lnglat, moveCenter = true) {
             const T = window.T;
             this.lnglat = lnglat;
             if (moveCenter) {
-                let offLng = this.options.centerOffset[0] || 0;
-                let offLat = this.options.centerOffset[1] || 0;
-                const zoom = this.map?.getZoom() || this.currentZoom
-                const offsetRateMaps = this.options.offsetRateMaps
-                const rate = offsetRateMaps[zoom] || 1
-                offLng = offLng * rate
-                offLat = offLat * rate
-                const offsetCenter = new T.LngLat(
-                    lnglat.lng + Number(offLng.toFixed(6)),
-                    lnglat.lat + Number(offLat.toFixed(6))
-                );
-                this.map.centerAndZoom(offsetCenter, zoom);
+                this.moveCenter(lnglat)
             }
             if (!marker) {
                 marker = new T.Marker(lnglat,{
@@ -631,7 +634,11 @@ export default {
             if(city.c){
                 this.cityObj = city
                 this.cityName = city.n
-                searchObj.setSpecifyAdminCode('156'+city.c)
+                searchObj.setSpecifyAdminCode(city.c)
+                const {t} = city // {lat,lng}
+                if(t){
+                    this.moveCenter(new T.LngLat(t.lng,t.lat))
+                }
             }
             this.showCityPicker = false
             
@@ -695,7 +702,7 @@ export default {
                     province,
                     province_code,
                 } = addressComponent
-                const c = (city_code?city_code:province_code).substring(3)
+                const c = city_code?city_code:province_code
                 const cityObj = {
                     n:city?city:province,
                     c:c,
