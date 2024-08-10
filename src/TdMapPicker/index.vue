@@ -1,32 +1,38 @@
 <template>
     <div class="td_map_picker">
         <div class="td_map" :id="mapid"></div>
-        <div class="td_map_city_picker" v-if="options.showCity" @click.stop="openCityPicker">{{cityName}}</div>
-        <div class="td_map_city_picker_popup" :class="{fullHeight:showCityPicker}">
-            <div class="city_cover" @click.stop="showCityPicker=false"></div>
-            <div class="city_box" ref="cityBoxRef">
-                <div class="city_filter">
-                    <input type="text" style="width: 100%;" class="td_search_input" placeholder="输入城市名称" v-model="cityFilter" />
+        <div class="td_map_city_picker" v-if="options.showCity" @click.stop="openCityPicker">{{ cityName }}</div>
+        <div class="td_map_city_picker_popup" :class="{ fullHeight: showCityPicker }">
+            <div class="city_cover" @click.stop="showCityPicker = false"></div>
+            <div class="city_hot_list" @click.stop="showCityPicker = false" v-if="options.hotCitys && options.hotCitys.length">
+                <div class="city_hot_title">热门城市：</div>
+                <div class="city_hot_list_box">
+                    <div class="city_hot_item" v-for="city in options.hotCitys" @click.stop="findCity(city)" :key="city">
+                        {{ city }}</div>
                 </div>
-                <template v-for="p in cityList" >
+            </div>
+            <div class="city_box" ref="cityBoxRef">
+
+                <div class="city_filter">
+                    <input type="text" style="width: 100%;" class="td_search_input" placeholder="输入城市名称"
+                        v-model="cityFilter" />
+                </div>
+                <template v-for="p in cityList">
                     <div class="city_item" v-if="p.show" :key="p.c">
-                        <div class="city_item_province picker_btn"
-                        :class="{
-                            filter_status:p.filterStatus,
-                            current_city:cityObj.c === p.c
-                        }"
-                        :id="p.c"
-                        @click.stop="setCity(p)">{{ p.n }}</div>
-                        
+                        <div class="city_item_province picker_btn" :class="{
+                            filter_status: p.filterStatus,
+                            current_city: cityObj.c === p.c
+                        }" :id="p.c" @click.stop="setCity(p)">{{ p.n }}</div>
+
                         <div class="city_item_box">
                             <template v-for="c in p.d">
                                 <div class="city picker_btn" :id="c.c" :class="{
-                                    filter_status:c.filterStatus,
-                                    current_city:cityObj.c === c.c
-                            }"   @click.stop="setCity(c)" :key="c.c">{{ c.n }}</div>
+                                    filter_status: c.filterStatus,
+                                    current_city: cityObj.c === c.c
+                                }" @click.stop="setCity(c)" :key="c.c">{{ c.n }}</div>
                             </template>
                         </div>
-                    
+
                     </div>
                 </template>
             </div>
@@ -38,10 +44,9 @@
                 <img class="location_icon" src="./images/location.png" alt="">
             </div>
             <div class="route_plans" v-if="planCount && options.showRoute">
-                <div class="route_plan_btn" 
-                    @click.stop="showPlan(plan)"
-                    v-for="plan,planIndex in routePlans" :key="`plan${planIndex}`">
-                    线路{{ planIndex+1 }}({{ plan.distance }}km)
+                <div class="route_plan_btn" @click.stop="showPlan(plan)" v-for="plan, planIndex in routePlans"
+                    :key="`plan${planIndex}`">
+                    线路{{ planIndex + 1 }}({{ plan.distance }}km)
                 </div>
             </div>
             <div class="tips">
@@ -105,11 +110,11 @@ import coord from './coord.js';
 import cityList_ from './level.min.json';
 import startImg from './images/start.png';
 
-cityList_.forEach(p=>{
+cityList_.forEach(p => {
     p.show = true
     p.filter = p.n
     p.filterStatus = false;
-    p.d.forEach(c=>{
+    p.d.forEach(c => {
         c.show = true
         c.filter = p.n + c.n
         c.filterStatus = false;
@@ -215,7 +220,7 @@ const props = {
         type: String,
         default: "#1890ff"
     },
-    fontSize:{
+    fontSize: {
         type: String,
         default: "0.98rem"
     },
@@ -234,9 +239,9 @@ const props = {
         default: "",
     },
     /** 是否显示线路 */
-    showRoute:{
-        type:Boolean,
-        default:false
+    showRoute: {
+        type: Boolean,
+        default: false
     },
     /** policy：策略常量。常量如下：
         TMAP_DRIVING_POLICY_LEAST_TIME = 0 最少时间
@@ -256,19 +261,26 @@ const props = {
         default: false
     },
     /** 提交地址的时候，名称优先使用兴趣点名称 */
-    usePoi:{
-        type:Boolean,
-        default:false
+    usePoi: {
+        type: Boolean,
+        default: false
     },
     /** 优先使用兴趣点时候，这个范围内的兴趣点才能被使用 */
-    poiDistance:{
-        type:Number,
-        default:30
+    poiDistance: {
+        type: Number,
+        default: 30
     },
     /** 显示城市选择器 */
-    showCity:{
-        type:Boolean,
-        default:true
+    showCity: {
+        type: Boolean,
+        default: true
+    },
+    /** 热门城市 */
+    hotCitys: {
+        type: Array,
+        default() {
+            return ['上海市', '北京市']
+        }
     }
 };
 export default {
@@ -292,32 +304,32 @@ export default {
             hidePopup: this.defaultHide,
             routeLoadFlag: true,
             loadWxSdkFlag: false,
-            routePlans:[],
-            planCount:0,
-            cityName:'选择城市',
-            cityObj:{},
+            routePlans: [],
+            planCount: 0,
+            cityName: '选择城市',
+            cityObj: {},
             cityList,
-            showCityPicker:false,
-            cityFilter:''
+            showCityPicker: false,
+            cityFilter: ''
         };
     },
     watch: {
         value() {
             this.changeValue(this.value)
         },
-        cityFilter(){
+        cityFilter() {
             const word = this.cityFilter.trim()
-            this.cityList.forEach(p=>{
+            this.cityList.forEach(p => {
                 let showP = false;
-                p.d.forEach(c=>{
-                    c.filterStatus = word&&c.n.indexOf(word)>=0
-                    c.show = !word || c.filter.indexOf(word)>=0
-                    if(c.show){
+                p.d.forEach(c => {
+                    c.filterStatus = word && c.n.indexOf(word) >= 0
+                    c.show = !word || c.filter.indexOf(word) >= 0
+                    if (c.show) {
                         showP = true
                     }
                 })
-                p.show = !word || showP || p.filter.indexOf(word)>=0
-                p.filterStatus = word&&p.n.indexOf(word)>=0
+                p.show = !word || showP || p.filter.indexOf(word) >= 0
+                p.filterStatus = word && p.n.indexOf(word) >= 0
             })
         }
     },
@@ -531,7 +543,7 @@ export default {
         showMessage(msg) {
             alert(msg);
         },
-        moveCenter(lnglat){
+        moveCenter(lnglat) {
             let offLng = this.options.centerOffset[0] || 0;
             let offLat = this.options.centerOffset[1] || 0;
             const zoom = this.map?.getZoom() || this.currentZoom
@@ -552,8 +564,8 @@ export default {
                 this.moveCenter(lnglat)
             }
             if (!marker) {
-                marker = new T.Marker(lnglat,{
-                    zIndexOffset:2
+                marker = new T.Marker(lnglat, {
+                    zIndexOffset: 2
                 });
                 this.map.addOverLay(marker);
                 marker.enableDragging();
@@ -566,22 +578,22 @@ export default {
                 marker.setLngLat(lnglat);
             }
         },
-        setStartPoint(){
+        setStartPoint() {
             const { startLonlat } = this.options;
             if (startLonlat) {
                 const g = this.coordTypeToLonlat(startLonlat)
                 const lnglat = new window.T.LngLat(g[0], g[1]);
-                if(startMarker){
+                if (startMarker) {
                     startMarker.setLngLat(lnglat)
-                }else{
+                } else {
                     const icon = new T.Icon({
                         iconUrl: startImg,
                         iconSize: new T.Point(25, 41),
                         iconAnchor: new T.Point(12.5, 41),
                     });
-                    startMarker = new T.Marker(lnglat,{
-                        opacity:0.8,
-                        zIndexOffset:1,
+                    startMarker = new T.Marker(lnglat, {
+                        opacity: 0.8,
+                        zIndexOffset: 1,
                         icon
                     });
                     this.map.addOverLay(startMarker);
@@ -601,7 +613,7 @@ export default {
             this.pointsList = [];
             searchObj.search(this.searchWord);
         },
-        createSearchObj(){
+        createSearchObj() {
             if (!searchObj) {
                 searchObj = new T.LocalSearch(this.map, {
                     pageCapacity: 5,
@@ -611,37 +623,62 @@ export default {
                 });
             }
         },
-        openCityPicker(){
+        openCityPicker() {
             this.showCityPicker = true
-            this.$nextTick(()=>{
+            this.$nextTick(() => {
                 // 滚动到当前城市
                 let cityBox = this.$refs.cityBoxRef
                 let currentCity = cityBox.querySelector('.current_city')
-                if(currentCity){
+                if (currentCity) {
                     // 如果选中的是城市，滚动到父级
                     let offsetTop = currentCity.offsetTop
-                    if(currentCity.className.startsWith('city ')){
+                    if (currentCity.className.startsWith('city ')) {
                         currentCity = currentCity.parentNode.parentNode
-                        offsetTop = currentCity.offsetTop 
+                        offsetTop = currentCity.offsetTop
                     }
                     cityBox.scrollTop = offsetTop - 40
                 }
             })
         },
-        setCity(city){
+        setCity(city) {
             this.createSearchObj()
-            this.log(city,'city')
-            if(city.c){
+            this.log(city, 'city')
+            if (city.c) {
                 this.cityObj = city
                 this.cityName = city.n
                 searchObj.setSpecifyAdminCode(city.c)
-                const {t} = city // {lat,lng}
-                if(t){
-                    this.moveCenter(new T.LngLat(t.lng,t.lat))
+                const { t } = city // {lat,lng}
+                if (t) {
+                    this.moveCenter(new T.LngLat(t.lng, t.lat))
                 }
             }
             this.showCityPicker = false
-            
+
+        },
+        findCity(cityName){
+            let city = null;
+            let findStatus = false;
+            for(let p of this.cityList){
+                if(p.n === cityName){
+                    city = p
+                    findStatus = true
+                    break
+                }
+                
+                for(let c of p.d){
+                    if(c.n === cityName){
+                        city = c
+                        findStatus = true
+                        break
+                    }
+                }
+                if(findStatus){
+                    break
+                }
+            }
+            if(city){
+                this.setCity(city)
+            }
         },
         searchOnResult(result) {
             this.total = result.getCount();
@@ -692,7 +729,7 @@ export default {
             const that = this;
             geocode.getLocation(that.lnglat, function (result) {
                 const name = that.getPointName(result);
-                that.log(result,'逆地理编码')
+                that.log(result, '逆地理编码')
                 const addressComponent = result.addressComponent
                 const {
                     county,
@@ -702,17 +739,17 @@ export default {
                     province,
                     province_code,
                 } = addressComponent
-                const c = city_code?city_code:province_code
+                const c = city_code ? city_code : province_code
                 const cityObj = {
-                    n:city?city:province,
-                    c:c,
-                    d:[{
-                        n:county,
-                        c:county_code
+                    n: city ? city : province,
+                    c: c,
+                    d: [{
+                        n: county,
+                        c: county_code
                     }]
                 }
                 that.setCity(cityObj)
-                if(coverAddressComponent){
+                if (coverAddressComponent) {
                     that.setCurrentPoint({
                         name: name,
                         address: result.formatted_address,
@@ -720,7 +757,7 @@ export default {
                         ...that.currentPoint,
                         addressComponent: result.addressComponent,
                     });
-                }else{
+                } else {
                     that.setCurrentPoint({
                         name: name,
                         address: result.formatted_address,
@@ -762,7 +799,7 @@ export default {
                         const plans = result.getNumPlans();
                         that.planObj = result;
                         that.options.showRoute && that.showPlans(result);
-                        that.log('规划线路数量：',plans)
+                        that.log('规划线路数量：', plans)
                         if (plans) {
                             const plan = result.getPlan(0);
                             resolve({
@@ -788,38 +825,38 @@ export default {
             });
         },
         /** 显示线路 */
-        showPlans(plans){
+        showPlans(plans) {
             this.planCount = plans.getNumPlans();
-            if(!this.planCount){return}
+            if (!this.planCount) { return }
             const routePlans = []
-            for(let i=0;i<this.planCount;i++){
+            for (let i = 0; i < this.planCount; i++) {
                 routePlans.push(plans.getPlan(i))
-                if(i===0){
+                if (i === 0) {
                     this.showPlan(plans.getPlan(i))
                 }
             }
             this.routePlans = routePlans;
         },
         /** 在地图上绘制线路 */
-        showPlan(plan){
+        showPlan(plan) {
             const T = window.T;
             // const pointGroup = plan.routes.item.map(row=>{
             //     const [lng,lat] = row.turnlatlon.split(',')
             //     return new T.LngLat(lng,lat)
             // });
-            const pointGroup = plan.result.routelatlon.split(';').filter(item=>item).map(row=>{
-                const [lng,lat] = row.split(',')
-                return new T.LngLat(lng,lat)
+            const pointGroup = plan.result.routelatlon.split(';').filter(item => item).map(row => {
+                const [lng, lat] = row.split(',')
+                return new T.LngLat(lng, lat)
             });
-            if(this.polyline){
+            if (this.polyline) {
                 this.map.removeOverLay(this.polyline)
             }
-            this.log('pointGroup',pointGroup)
+            this.log('pointGroup', pointGroup)
             this.polyline = new T.Polyline(pointGroup, {
                 color: "#ff0000",
                 weight: 2,
                 opacity: 0.7,
-            });        
+            });
             this.map.addOverLay(this.polyline);
         },
         /** 检查是否处于小程序环境，调用api返回小程序并提交参数 */
@@ -832,26 +869,26 @@ export default {
                 alert('请在小程序环境中使用webview')
             }
         },
-        getPointName(fullPoint){
-            if(this.options.usePoi){
+        getPointName(fullPoint) {
+            if (this.options.usePoi) {
                 // 使用兴趣点作为定位名称，而不是地址
                 const addressComponent = fullPoint.addressComponent
-                if(addressComponent.poi && addressComponent.poi_distance <= this.options.poiDistance){
+                if (addressComponent.poi && addressComponent.poi_distance <= this.options.poiDistance) {
                     return addressComponent.poi
                 }
             }
-            return fullPoint.name||fullPoint.address
+            return fullPoint.name || fullPoint.address
         },
         submitPoint() {
             const value = this.lonlatToCoordType(this.currentPoint.lonlat).join(',')
             this.currentPoint.lonlat = value
             this.currentPoint.coordType = this.options.coordType
             this.currentPoint.name = this.getPointName(this.currentPoint)
-            this.log('提交', this.currentPoint,this.options)
+            this.log('提交', this.currentPoint, this.options)
             this.$emit("submit", this.currentPoint);
             if (this.options.mode === "webview") {
                 this.submitMPWebview();
-            }else{
+            } else {
                 this.$emit("input", value);
             }
         }
@@ -866,7 +903,7 @@ export default {
     position: relative;
     --pop-mini-height: 4.4rem;
     --pop-full-height: 23.2rem;
-    
+
 }
 
 .td_map {
@@ -1084,8 +1121,9 @@ export default {
     color: var(--td_map_picker_color);
     /* 阴影 */
     /* box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1); */
-    
+
 }
+
 .route_plan_btn {
     display: flex;
     justify-content: center;
@@ -1180,7 +1218,7 @@ export default {
     opacity: 0;
     transition: all 0.3s;
     overflow: hidden;
-    
+
 }
 
 .td_map_city_picker_popup.fullHeight {
@@ -1200,7 +1238,7 @@ export default {
 
 .city_box {
     position: absolute;
-    background: #fff;
+    background: #f7f7f7;
     padding: 0.2rem 0.4rem;
     border-radius: 0.2rem;
     color: #333;
@@ -1211,7 +1249,7 @@ export default {
     z-index: 9999;
     overflow: auto;
     /* css变动过渡 */
-    transition: all 0.3s; 
+    transition: all 0.3s;
 }
 
 .city_filter {
@@ -1224,21 +1262,23 @@ export default {
     top: 0;
     background: #fff;
     box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.1);
-    
+
 }
 
 .filter_status {
-    color: #f10022!important;
+    color: #f10022 !important;
 }
 
 .city_item {
     display: flex;
     flex-direction: column;
 }
+
 .city_item:not(:first-child) {
     border-top: 1px solid #ccc;
 }
-.city_item:not(:last-child){
+
+.city_item:not(:last-child) {
     margin-bottom: 1rem;
 }
 
@@ -1266,5 +1306,30 @@ export default {
 
 .city_item_box.city {
     color: #333;
+}
+
+.city_hot_list {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0.8rem;
+    justify-content: flex-end;
+    width: calc(100% - 1.6rem);
+    color: #fff;
+    z-index: 99999;
+}
+.city_hot_list_box {
+    display: flex;
+    align-items: center;
+}
+.city_hot_item {
+    padding: 0.2rem 0.4rem;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    margin-left: 0.4rem;
+    cursor: pointer;
+    color: var(--td_map_picker_color);
+    border: 1px solid var(--td_map_picker_color);
+    background: #fff;
 }
 </style>

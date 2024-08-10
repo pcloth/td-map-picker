@@ -5,6 +5,8 @@
 [![](https://img.shields.io/npm/dm/td-map-picker)](https://www.npmjs.com/package/td-map-picker)
 
 ## 更新日志
+#### 0.1.27
+1. 添加热门城市参数
 
 #### 0.1.25
 1. 修复城市选择器的宽度 
@@ -100,6 +102,7 @@ body {
 |usePoi|boolen|选中地图或者提交的时候，是否以就近兴趣点作为地点名称|false|
 |poiDistance|number|以兴趣点作为名称时，参考距离，如果大于这个距离就使用地址作为名称|30|
 |showCity|boolen|是否显示城市选择器|true|
+|hotCitys|array|热门城市列表|["上海市","北京市"]|
 
 ### 事件
 |事件|参数|说明|
