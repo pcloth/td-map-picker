@@ -5,6 +5,10 @@
 [![](https://img.shields.io/npm/dm/td-map-picker)](https://www.npmjs.com/package/td-map-picker)
 
 ## 更新日志
+
+#### 0.1.28
+1. 当不显示线路的时候，避免双坐标提交时也计算了线路
+
 #### 0.1.27
 1. 添加热门城市参数
 

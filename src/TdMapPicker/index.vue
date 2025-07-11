@@ -771,7 +771,7 @@ export default {
             this.routeLoadFlag = false;
             const { startLonlat, drivingPolicy } = this.options;
             let drives = {};
-            if (startLonlat) {
+            if (this.options.showRoute && startLonlat) {
                 drives = await this.getDrivingRoute(
                     this.coordTypeToLonlat(startLonlat).join(','),
                     data.lonlat,
